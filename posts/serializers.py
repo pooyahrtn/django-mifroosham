@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Post, Feed, Auction, Discount
 from django.contrib.auth.models import User
-from profiles.serializers import UserSerializer
+from profiles.serializers import UserSerializer, ProfileSerializer
 
 
 class AuctionSerializer(serializers.ModelSerializer):
@@ -26,6 +26,7 @@ class PostWithoutSenderSerializer(serializers.ModelSerializer):
     auction = AuctionSerializer(allow_null=True)
     post_type = serializers.IntegerField(source='get_post_type', read_only=True)
     image_url = serializers.CharField()
+    n_likes = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Post
@@ -66,7 +67,6 @@ class PostSerializer(PostWithoutSenderSerializer):
         return Post.objects.create(**validated_data)
 
 
-
 class FeedSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)
 
@@ -76,3 +76,19 @@ class FeedSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class PostDetailSerializer(PostSerializer):
+    you_liked = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Post
+        exclude = ('likes',)
+
+
+class UserWithPostSerializer(serializers.ModelSerializer):
+    posts = PostWithoutSenderSerializer(read_only=True, many=True)
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('posts', 'profile','username')
+        depth = 2

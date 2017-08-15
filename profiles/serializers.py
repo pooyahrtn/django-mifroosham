@@ -1,9 +1,7 @@
 from rest_framework import serializers
-
-from posts.models import Post
+# from posts.serializers import PostWithoutSenderSerializer
 from .models import Profile
 from django.contrib.auth.models import User
-
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -17,17 +15,20 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'profile')
+        fields = ('username', 'profile')
         depth = 1
 
-#
-# class UserWithPostsSerializer(serializers.ModelSerializer):
-#     profile = ProfileSerializer()
-#     posts = serializers.PrimaryKeyRelatedField(many=True, queryset=Post.objects.all())
-#
-#     class Meta:
-#         model = User
-#         fields = '__all__'
-#         depth = 1
+
+
+class FollowSerializers(serializers.ModelSerializer):
+    following = serializers.BooleanField()
+    username = serializers.CharField(read_only=True)
+    profile = ProfileSerializer(read_only=True)
+    requester = UserSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'profile', 'following', 'requester')
+        depth = 1
 
 

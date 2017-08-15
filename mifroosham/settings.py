@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'posts.apps.PostsConfig',
     'profiles.apps.ProfilesConfig',
+    'transactions.apps.TransactionsConfig'
 ]
 
 MIDDLEWARE = [

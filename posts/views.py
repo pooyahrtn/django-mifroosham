@@ -1,56 +1,12 @@
 from rest_framework.decorators import api_view
 from .models import Post, Feed
-from .serializers import PostSerializer, FeedSerializer, PostWithoutSenderSerializer, LikePostSerializer
-from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
+from .serializers import PostSerializer, FeedSerializer, PostWithoutSenderSerializer, LikePostSerializer, PostDetailSerializer
 from rest_framework.response import Response
-from rest_framework import status
+from profiles.serializers import UserSerializer
 from django.contrib.auth.models import User
 from django.db import transaction
 import json
 from rest_framework import generics
-
-
-def get_user(username):
-    try:
-        user = User.objects.get(username=username)
-        return user
-    except User.DoesNotExist:
-        raise Response(status=status.HTTP_404_NOT_FOUND)
-
-
-def get_user_from_pk(pk):
-    try:
-        user = User.objects.get(pk=pk)
-        return user
-    except User.DoesNotExist:
-        raise Response(status=status.HTTP_404_NOT_FOUND)
-
-# class PostList(generics.ListCreateAPIView)
-
-
-class PostList(APIView):
-
-    def get_user(self, username):
-        try:
-            user = User.objects.get(username=username)
-            return user
-        except User.DoesNotExist:
-            raise Response(status=status.HTTP_404_NOT_FOUND)
-
-    def get(self, request, username,format=None):
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
-
-#
-# class FeedList(APIView):
-#
-#     def get(self, request, username, format=None):
-#         user = get_user(username)
-#         feeds = user.feed_set.all()
-#         serializer = FeedSerializer(feeds, many=True)
-#         return Response(serializer.data)
 
 
 class FeedList(generics.ListAPIView):
@@ -59,6 +15,7 @@ class FeedList(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.feed_set.all()
+
 
 class LikePost(generics.UpdateAPIView):
     queryset = Post.objects.all()
@@ -96,22 +53,26 @@ class UserPosts(generics.ListAPIView):
         return Response(serializer.data)
 
     def filter_queryset(self, queryset):
-        # return User.objects.get(username=self.lookup_field).posts.all()
         return queryset.filter(sender__username=self.kwargs['username'])
 
-#
-# class PostDetail(generics.RetrieveAPIView):
-#     queryset = Post.objects.all()
-#     ser
+
+class PostDetail(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostDetailSerializer
+
+    def get_object(self):
+        return Post.objects.get(pk=self.kwargs['pk'])
+
+    def retrieve(self, request, *args, **kwargs):
+        serializer = PostDetailSerializer(self.get_object())
+        data = serializer.data
+        data['you_liked'] = self.get_object().likes.filter(username=self.request.user.username).exists()
+        return Response(data)
 
 
+class PostLikers(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
-
-# class UserPosts(APIView):
-#     def get(self, request, username):
-#         user = get_user(username=username)
-#         posts = user.posts.all()
-#         # i cant remember what was the following line. correct it.
-#         serializer = PostSerializer(posts, many=True)
-#         return Response(serializer.data)
-
+    def get_queryset(self):
+        return Post.objects.get(pk=self.kwargs['pk']).likes.all()

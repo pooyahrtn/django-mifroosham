@@ -21,10 +21,13 @@ class Auction(models.Model):
 
 
 class Post(models.Model):
+    NORMAL_ITEM = 0
+    DISCOUNT_ITEM = 1
+    AUCTION_ITEM = 2
     sender = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='posts')
     sent_time = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100)
-    price = models.BigIntegerField(blank=True)
+    price = models.BigIntegerField(blank=True, null=True)
     is_charity = models.BooleanField(default=False)
     image_url = models.ImageField()
     description = models.CharField(max_length=600, blank=True)
@@ -32,16 +35,18 @@ class Post(models.Model):
     n_likes = models.IntegerField(default=0)
     discount = models.OneToOneField(Discount, on_delete=models.CASCADE,blank=True, null=True)
     auction = models.OneToOneField(Auction, on_delete=models.CASCADE, blank=True, null=True)
+    disable_after_buy = models.BooleanField(default=True)
+    disabled = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
 
     def get_post_type(self):
         if self.auction is not None:
-            return 2
+            return self.AUCTION_ITEM
         elif self.discount is not None:
-            return 1
-        return 0
+            return self.DISCOUNT_ITEM
+        return self.NORMAL_ITEM
 
 
 class Feed(models.Model):
@@ -51,7 +56,6 @@ class Feed(models.Model):
 
     class Meta:
         ordering = ['-pk']
-
 
 
 @receiver(post_save, sender=Post)

@@ -8,8 +8,9 @@ from django.dispatch import receiver
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     money = models.BigIntegerField(null=True)
-    # followings = models.ManyToManyField(to="self", related_name="followers", blank=True)
     avatar_url = models.ImageField(null=True, blank=True)
+    bio = models.CharField(max_length=400, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
@@ -18,6 +19,8 @@ class Profile(models.Model):
 class Follow(models.Model):
     followers = models.ManyToManyField(to=User, blank=True, related_name='followings')
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    n_followers = models.IntegerField(default=0)
+    n_followings = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username
