@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from profiles.serializers import UserSerializer
 from django.contrib.auth.models import User
 from django.db import transaction
-import json
 from rest_framework import generics
 
 

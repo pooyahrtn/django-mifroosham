@@ -27,4 +27,10 @@ class HasNotConfirmed(APIException):
 class AlreadyDelivered(APIException):
     status_code = 513
     default_detail = 'already_delivered'
-    default_code =  'alread_delivered'
+    default_code = 'already_delivered'
+
+
+class YouAreNotAuthorised(APIException):
+    status_code = 515
+    default_code = 'you_are_not_authorised'
+    default_detail = 'you are not authorised'

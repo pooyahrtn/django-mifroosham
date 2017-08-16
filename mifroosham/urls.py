@@ -19,7 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from posts import views
 from profiles.views import FollowUser, UserDetail
-from transactions.views import TransactionsList, BuyPost, CancelBuy, ConfirmSell
+from transactions.views import TransactionsList, BuyPost, CancelBuy, ConfirmSell, DeliverItem, CancelSell
 # from profiles.views import UserPosts
 
 urlpatterns = [
@@ -35,6 +35,8 @@ urlpatterns = [
     url(r'^buy/(?P<post_pk>[0-9]+)$', BuyPost.as_view()),
     url(r'^cancel/(?P<pk>[0-9]+)$', CancelBuy.as_view()),
     url(r'^confirmsell/(?P<pk>[0-9]+)$', ConfirmSell.as_view()),
+    url(r'^deliveritem/(?P<pk>[0-9]+)$', DeliverItem.as_view()),
+    url(r'^cancelsell/(?P<pk>[0-9]+)$', CancelSell.as_view()),
     url(r'^(?P<username>[a-z]+)/$', UserDetail.as_view()),
 ]
 

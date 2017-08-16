@@ -2,6 +2,15 @@ from rest_framework import serializers
 from .models import Post, Feed, Auction, Discount
 from django.contrib.auth.models import User
 from profiles.serializers import UserSerializer, ProfileSerializer
+import time
+from django.utils import timezone
+
+
+def validate_dicount_time(end_time):
+    less = int(time.mktime(timezone.now().timetuple()))
+    greater = int(time.mktime(end_time.timetuple()))
+    if less > greater:
+        raise serializers.ValidationError('end_time is greater than now')
 
 
 class AuctionSerializer(serializers.ModelSerializer):
@@ -19,6 +28,14 @@ class DiscountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discount
         fields = ('start_price', 'real_price', 'start_time', 'end_time')
+
+    def create(self, validated_data):
+        validate_dicount_time( validated_data.get('end_time'))
+        super(DiscountSerializer, self).create(validated_data)
+
+    def update(self, instance, validated_data):
+        validate_dicount_time(validated_data.get('end_time'))
+        super(DiscountSerializer, self).update(instance, validated_data)
 
 
 class PostWithoutSenderSerializer(serializers.ModelSerializer):
@@ -75,6 +92,7 @@ class PostSerializer(PostWithoutSenderSerializer):
             validated_data.pop('auction', None)
             return Post.objects.create(auction=auction, **validated_data)
         elif discount_data is not None:
+            validate_dicount_time(discount_data.get('end_time'))
             discount = Discount.objects.create(**discount_data)
             validated_data.pop('discount', None)
             return Post.objects.create(discount=discount, **validated_data)

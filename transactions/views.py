@@ -73,10 +73,6 @@ class BuyPost(generics.CreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-        # @transaction.atomic
-        # def perform_create(self, serializer):
-        #     post = get_object_or_404(Post, pk=self.kwargs['post_pk'])
-        #
 
 
 class CancelBuy(generics.UpdateAPIView):
@@ -89,6 +85,9 @@ class CancelBuy(generics.UpdateAPIView):
     def perform_update(self, serializer):
         post = self.get_object().post
         trans = self.get_object()
+        if trans.buyer.pk != self.request.user.pk:
+            raise YouAreNotAuthorised()
+
         if trans.confirmed:
             if get_delta_hours(trans.confirm_time) < post.deliver_time:
                 raise SoonForCancelException()
@@ -96,7 +95,7 @@ class CancelBuy(generics.UpdateAPIView):
             raise AlreadyCanceled()
         self.request.user.profile.money += trans.suspended_money
         Profile.objects.filter(user_id=self.request.user.pk).update(money=F('money') + trans.suspended_money)
-        serializer.save(status=Transaction.CANCELED)
+        serializer.save(status=Transaction.CANCELED, cancel_time=timezone.now())
 
 
 class ConfirmSell(generics.UpdateAPIView):
@@ -106,32 +105,62 @@ class ConfirmSell(generics.UpdateAPIView):
     @transaction.atomic
     def perform_update(self, serializer):
         trans = self.get_object()
+        if trans.post.sender.pk != self.request.user.pk:
+            raise YouAreNotAuthorised()
+
         if trans.confirmed:
             raise AlreadyConfirmed()
         if trans.status == Transaction.CANCELED or trans.status == Transaction.DELIVERED:
             raise AlreadyCanceled()
-        for other_user_transaction in Transaction.objects.filter(Q(post=trans.post), Q(status=Transaction.PENDING),
-                                                                 ~Q(pk=trans.pk)):
-            Profile.objects.filter(user_id=other_user_transaction.buyer.pk). \
-                update(money=F('money') + other_user_transaction.suspended_money)
+        if trans.post.disable_after_buy:
+            trans.post.disabled = True
+            trans.post.save()
+            for other_user_transaction in Transaction.objects.filter(Q(post=trans.post), Q(status=Transaction.PENDING),
+                                                                     ~Q(pk=trans.pk)):
+                Profile.objects.filter(user_id=other_user_transaction.buyer.pk). \
+                    update(money=F('money') + other_user_transaction.suspended_money)
         serializer.save(confirmed=True, confirm_time=timezone.now())
 
 
 class DeliverItem(generics.UpdateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+    # permission = transaction.post.
 
     @transaction.atomic
     def perform_update(self, serializer):
         trans = self.get_object()
+        if trans.buyer.pk!= self.request.user.pk:
+            raise YouAreNotAuthorised()
         if not trans.confirmed:
             raise HasNotConfirmed()
         if trans.status == Transaction.DELIVERED:
             raise AlreadyDelivered()
         if trans.status == Transaction.CANCELED:
             raise AlreadyCanceled()
+        seller = trans.post.sender
+        Profile.objects.filter(user_id=seller.pk).update(money=F('money') + trans.suspended_money)
+        serializer.save(status=Transaction.DELIVERED, deliver_time = timezone.now())
 
-        
+
+class CancelSell(generics.UpdateAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        trans = self.get_object()
+        if trans.post.sender.pk != self.request.user.pk:
+            raise YouAreNotAuthorised()
+        if trans.status == Transaction.DELIVERED:
+            raise AlreadyDelivered()
+        if trans.status == Transaction.CANCELED:
+            raise AlreadyCanceled()
+        if not trans.confirmed:
+            raise AlreadyConfirmed()
+        buyer = trans.buyer
+        Profile.objects.filter(user_id=buyer.pk).update(money=F('money') + trans.suspended_money)
+        serializer.save(status=Transaction.CANCELED, cancel_time=timezone.now())
 
 
 class TransactionsList(generics.ListAPIView):

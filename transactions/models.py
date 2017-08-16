@@ -26,6 +26,8 @@ class Transaction(models.Model):
     #todo: remove null = True
     time = models.DateTimeField(auto_now_add=True, null=True)
     confirm_time = models.DateTimeField(null=True)
+    deliver_time = models.DateTimeField(null=True)
+    cancel_time = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.post.title + ' buyer: ' + self.buyer.username
