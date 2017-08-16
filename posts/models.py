@@ -32,11 +32,14 @@ class Post(models.Model):
     image_url = models.ImageField()
     description = models.CharField(max_length=600, blank=True)
     likes = models.ManyToManyField(to=User,blank=True,related_name='likes')
+    reposters = models.ManyToManyField(to=User, blank=True, related_name='reposts')
     n_likes = models.IntegerField(default=0)
+    n_reposters = models.IntegerField(default=0)
     discount = models.OneToOneField(Discount, on_delete=models.CASCADE,blank=True, null=True)
     auction = models.OneToOneField(Auction, on_delete=models.CASCADE, blank=True, null=True)
     disable_after_buy = models.BooleanField(default=True)
     disabled = models.BooleanField(default=False)
+    deliver_time = models.IntegerField(default=24)
 
     def __str__(self):
         return self.title
@@ -53,6 +56,7 @@ class Feed(models.Model):
     # we need this because we dont want to override USER object
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
+    reposter = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True, related_name='repost_posts')
 
     class Meta:
         ordering = ['-pk']

@@ -20,10 +20,12 @@ class Transaction(models.Model):
         choices=STATUS_CHOICES,
         default=PENDING
     )
+    confirmed = models.BooleanField(default=False)
 
     suspended_money = models.BigIntegerField()
     #todo: remove null = True
     time = models.DateTimeField(auto_now_add=True, null=True)
+    confirm_time = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.post.title + ' buyer: ' + self.buyer.username

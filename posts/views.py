@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view
 from .models import Post, Feed
-from .serializers import PostSerializer, FeedSerializer, PostWithoutSenderSerializer, LikePostSerializer, PostDetailSerializer
+from .serializers import PostSerializer, FeedSerializer, PostWithoutSenderSerializer,\
+    LikePostSerializer, PostDetailSerializer, RepostPostSerializer
 from rest_framework.response import Response
 from profiles.serializers import UserSerializer
 from django.contrib.auth.models import User
@@ -33,6 +34,28 @@ class LikePost(generics.UpdateAPIView):
             post.likes.remove(liker)
             increment = -1
         serializer.save(user=self.request.user, liked=liked, n_likes=post.n_likes + increment)
+
+
+class Repost(generics.UpdateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = RepostPostSerializer
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        post = self.get_object()
+        reposter = self.request.user
+        reposted = not post.reposters.filter(pk=reposter.pk).exists()
+        increment = 1
+        if reposted:
+            post.reposters.add(reposter)
+            for user in reposter.follow.followers.all():
+                Feed.objects.create(user=user, post=post, reposter=self.request.user)
+        else:
+            post.reposters.remove(reposter)
+            increment = -1
+            for user in reposter.follow.followers.all():
+                Feed.objects.filter(user=user, post=post, reposter=self.request.user).delete()
+        serializer.save(user=self.request.user, reposted=reposted, n_reposters=post.n_reposters + increment)
 
 
 class SendPost(generics.CreateAPIView):

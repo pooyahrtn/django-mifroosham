@@ -27,10 +27,11 @@ class PostWithoutSenderSerializer(serializers.ModelSerializer):
     post_type = serializers.IntegerField(source='get_post_type', read_only=True)
     image_url = serializers.CharField()
     n_likes = serializers.IntegerField(read_only=True)
+    n_reposters = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Post
-        exclude = ('sender', 'likes')
+        exclude = ('sender', 'likes', 'reposters')
         depth = 1
 
 
@@ -39,10 +40,23 @@ class LikePostSerializer(serializers.ModelSerializer):
     liked = serializers.BooleanField(read_only=True)
     title = serializers.CharField(read_only=True)
     n_likes = serializers.IntegerField(read_only=True)
+    n_reposters = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Post
-        fields = ('pk', 'title', 'user', 'liked', 'n_likes')
+        fields = ('pk', 'title', 'user', 'liked', 'n_likes','n_reposters')
+
+
+class RepostPostSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    reposted = serializers.BooleanField(read_only=True)
+    title = serializers.CharField(read_only=True)
+    n_likes = serializers.IntegerField(read_only=True)
+    n_reposters = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Post
+        fields = ('pk', 'title', 'user', 'reposted', 'n_likes','n_reposters')
 
 
 class PostSerializer(PostWithoutSenderSerializer):
@@ -50,7 +64,7 @@ class PostSerializer(PostWithoutSenderSerializer):
 
     class Meta:
         model = Post
-        exclude = ('likes', )
+        exclude = ('likes', 'reposters')
         depth = 1
 
     def create(self, validated_data):
@@ -69,10 +83,11 @@ class PostSerializer(PostWithoutSenderSerializer):
 
 class FeedSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)
+    reposter = UserSerializer(read_only=True)
 
     class Meta:
         model = Feed
-        fields = ('post',)
+        fields = ('post','reposter')
         depth = 1
 
 

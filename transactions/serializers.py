@@ -10,6 +10,7 @@ class TransactionSerializer(serializers.ModelSerializer):
     status = serializers.ReadOnlyField()
     buyer = UserSerializer(read_only=True)
     suspended_money = serializers.ReadOnlyField()
+    confirmed = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Transaction

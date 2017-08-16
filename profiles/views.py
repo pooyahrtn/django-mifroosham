@@ -1,3 +1,4 @@
+from django.db.models import Q
 from posts.models import Feed
 from .models import User
 from .serializers import UserSerializer, FollowSerializers
@@ -13,7 +14,7 @@ def change_follower_feed(follower, who_followed, is_followed):
             Feed.objects.create(user=follower, post=post)
     else:
         for post in who_followed.posts.all():
-            Feed.objects.filter(user=follower, post=post).delete()
+            Feed.objects.filter(Q(user=follower) , Q(post=post) | Q(reposter=who_followed)).delete()
 
 
 class FollowUser(generics.UpdateAPIView):
