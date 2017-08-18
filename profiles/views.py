@@ -7,6 +7,7 @@ from rest_framework import generics
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from .exceptions import *
+from .permissions import *
 
 
 def change_follower_feed(follower, who_followed, is_followed):
@@ -19,15 +20,15 @@ def change_follower_feed(follower, who_followed, is_followed):
 
 
 class FollowUser(generics.UpdateAPIView):
-    # todo: remove Anonymous users permission
     queryset = User.objects.all()
     serializer_class = FollowSerializers
     lookup_field = 'username'
+    permission_classes = (permissions.IsAuthenticated, IsNotOwner)
 
     @transaction.atomic
     def perform_update(self, serializer):
         user = self.get_object()
-        if user.pk == self.request.user:
+        if user.pk == self.request.user.pk:
             raise FollowException(detail='you cant follow your self')
         following = user.follow.followers.filter(username=self.request.user.username).exists()
         if following:

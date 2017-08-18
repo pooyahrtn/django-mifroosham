@@ -11,6 +11,9 @@ class TransactionSerializer(serializers.ModelSerializer):
     buyer = UserSerializer(read_only=True)
     suspended_money = serializers.ReadOnlyField()
     confirmed = serializers.BooleanField(read_only=True)
+    confirm_time = serializers.ReadOnlyField()
+    deliver_time = serializers.ReadOnlyField()
+    cancel_time = serializers.ReadOnlyField()
 
     class Meta:
         model = Transaction

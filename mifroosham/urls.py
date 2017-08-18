@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from posts import views
 from profiles.views import FollowUser, UserDetail
 from transactions.views import TransactionsList, BuyPost, CancelBuy, ConfirmSell, DeliverItem, CancelSell
+from django.conf.urls import include
 # from profiles.views import UserPosts
 
 urlpatterns = [
@@ -40,7 +41,10 @@ urlpatterns = [
     url(r'^comments/(?P<pk>[0-9]+)$', views.Comments.as_view()),
     url(r'^suggestpost/', views.SuggestPost.as_view()),
     url(r'^(?P<username>[a-z]+)/$', UserDetail.as_view()),
-
+]
+urlpatterns += [
+    url(r'^api-auth/', include('rest_framework.urls',
+                               namespace='rest_framework')),
 ]
 
 if settings.DEBUG:

@@ -14,6 +14,7 @@ from rest_framework import status
 import time
 from django.utils import timezone
 from .exceptions import *
+from .permissions import *
 
 
 def calculate_discount_current_price(post):
@@ -35,6 +36,7 @@ class BuyPost(generics.CreateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
     lookup_field = 'post_pk'
+    permission_classes = (permissions.IsAuthenticated,)
 
     # attention! I do really scare of race condition.
 
@@ -77,8 +79,7 @@ class BuyPost(generics.CreateAPIView):
 class CancelBuy(generics.UpdateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-
-    # todo! correct with permissions!!!
+    permission_classes = (permissions.IsAuthenticated, IsBuyerOfTransaction)
 
     @transaction.atomic
     def perform_update(self, serializer):
@@ -100,6 +101,7 @@ class CancelBuy(generics.UpdateAPIView):
 class ConfirmSell(generics.UpdateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOfTransactionsPost)
 
     @transaction.atomic
     def perform_update(self, serializer):
@@ -124,8 +126,7 @@ class ConfirmSell(generics.UpdateAPIView):
 class DeliverItem(generics.UpdateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-
-    # permission = transaction.post.
+    permission_classes = (permissions.IsAuthenticated, IsBuyerOfTransaction)
 
     @transaction.atomic
     def perform_update(self, serializer):
@@ -146,6 +147,7 @@ class DeliverItem(generics.UpdateAPIView):
 class CancelSell(generics.UpdateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOfTransactionsPost)
 
     @transaction.atomic
     def perform_update(self, serializer):

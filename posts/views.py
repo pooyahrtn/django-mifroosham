@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework import generics
 from django.utils import timezone
+from .permissions import *
 
 
 class FeedList(generics.ListAPIView):
@@ -21,6 +22,7 @@ class FeedList(generics.ListAPIView):
 class LikePost(generics.UpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = LikePostSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     @transaction.atomic
     def perform_update(self, serializer):
@@ -39,6 +41,7 @@ class LikePost(generics.UpdateAPIView):
 class Repost(generics.UpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = RepostPostSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     @transaction.atomic
     def perform_update(self, serializer):
@@ -62,6 +65,7 @@ class Repost(generics.UpdateAPIView):
 class SendPost(generics.CreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     @transaction.atomic
     def perform_create(self, serializer):
@@ -105,6 +109,7 @@ class PostLikers(generics.ListAPIView):
 class Comments(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         return Comment.objects.filter(post_id=self.kwargs['pk'])
@@ -118,6 +123,7 @@ class Comments(generics.ListCreateAPIView):
 class SuggestPost(generics.ListCreateAPIView):
     queryset = Suggest.objects.all()
     serializer_class = SuggestSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         suggester = self.request.user

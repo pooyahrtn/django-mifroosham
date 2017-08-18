@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializers(serializers.ModelSerializer):
-    following = serializers.BooleanField()
+    following = serializers.BooleanField(read_only=True)
     username = serializers.CharField(read_only=True)
     profile = ProfileSerializer(read_only=True)
     requester = UserSerializer(read_only=True)
