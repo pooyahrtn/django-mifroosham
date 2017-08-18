@@ -74,7 +74,6 @@ class BuyPost(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-
 class CancelBuy(generics.UpdateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
@@ -125,12 +124,13 @@ class ConfirmSell(generics.UpdateAPIView):
 class DeliverItem(generics.UpdateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+
     # permission = transaction.post.
 
     @transaction.atomic
     def perform_update(self, serializer):
         trans = self.get_object()
-        if trans.buyer.pk!= self.request.user.pk:
+        if trans.buyer.pk != self.request.user.pk:
             raise YouAreNotAuthorised()
         if not trans.confirmed:
             raise HasNotConfirmed()
@@ -140,7 +140,7 @@ class DeliverItem(generics.UpdateAPIView):
             raise AlreadyCanceled()
         seller = trans.post.sender
         Profile.objects.filter(user_id=seller.pk).update(money=F('money') + trans.suspended_money)
-        serializer.save(status=Transaction.DELIVERED, deliver_time = timezone.now())
+        serializer.save(status=Transaction.DELIVERED, deliver_time=timezone.now())
 
 
 class CancelSell(generics.UpdateAPIView):
@@ -166,4 +166,3 @@ class CancelSell(generics.UpdateAPIView):
 class TransactionsList(generics.ListAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-

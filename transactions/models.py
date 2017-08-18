@@ -23,8 +23,7 @@ class Transaction(models.Model):
     confirmed = models.BooleanField(default=False)
 
     suspended_money = models.BigIntegerField()
-    #todo: remove null = True
-    time = models.DateTimeField(auto_now_add=True, null=True)
+    time = models.DateTimeField(auto_now_add=True)
     confirm_time = models.DateTimeField(null=True)
     deliver_time = models.DateTimeField(null=True)
     cancel_time = models.DateTimeField(null=True)

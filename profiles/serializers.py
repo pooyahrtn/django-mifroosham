@@ -19,7 +19,6 @@ class UserSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-
 class FollowSerializers(serializers.ModelSerializer):
     following = serializers.BooleanField()
     username = serializers.CharField(read_only=True)

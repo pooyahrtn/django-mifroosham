@@ -1,12 +1,13 @@
 from rest_framework.decorators import api_view
-from .models import Post, Feed
-from .serializers import PostSerializer, FeedSerializer, PostWithoutSenderSerializer,\
-    LikePostSerializer, PostDetailSerializer, RepostPostSerializer
+from .models import Post, Feed, Comment, Suggest
+from .serializers import PostSerializer, FeedSerializer, PostWithoutSenderSerializer, \
+    LikePostSerializer, PostDetailSerializer, RepostPostSerializer, CommentSerializer, SuggestSerializer
 from rest_framework.response import Response
 from profiles.serializers import UserSerializer
 from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework import generics
+from django.utils import timezone
 
 
 class FeedList(generics.ListAPIView):
@@ -48,7 +49,8 @@ class Repost(generics.UpdateAPIView):
         if reposted:
             post.reposters.add(reposter)
             for user in reposter.follow.followers.all():
-                Feed.objects.create(user=user, post=post, reposter=self.request.user)
+                if not user.followings.filter(user=post.sender).exists():
+                    Feed.objects.create(user=user, post=post, reposter=self.request.user, sort_time=timezone.now())
         else:
             post.reposters.remove(reposter)
             increment = -1
@@ -98,3 +100,29 @@ class PostLikers(generics.ListAPIView):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['pk']).likes.all()
+
+
+class Comments(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        return Comment.objects.filter(post_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        sender = self.request.user
+        post = Post.objects.get(pk=self.kwargs['pk'])
+        serializer.save(user=sender, post=post)
+
+
+class SuggestPost(generics.ListCreateAPIView):
+    queryset = Suggest.objects.all()
+    serializer_class = SuggestSerializer
+
+    def perform_create(self, serializer):
+        suggester = self.request.user
+        serializer.save(suggester=suggester)
+
+    def get_queryset(self):
+        return Suggest.objects.filter(suggest_to=self.request.user)
+

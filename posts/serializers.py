@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Feed, Auction, Discount
+from .models import Post, Feed, Auction, Discount, Comment, Suggest
 from django.contrib.auth.models import User
 from profiles.serializers import UserSerializer, ProfileSerializer
 import time
@@ -45,6 +45,7 @@ class PostWithoutSenderSerializer(serializers.ModelSerializer):
     image_url = serializers.CharField()
     n_likes = serializers.IntegerField(read_only=True)
     n_reposters = serializers.IntegerField(read_only=True)
+    id = serializers.ReadOnlyField()
 
     class Meta:
         model = Post
@@ -125,3 +126,30 @@ class UserWithPostSerializer(serializers.ModelSerializer):
         model = User
         fields = ('posts', 'profile','username')
         depth = 2
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    time = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Comment
+        fields = ('text', 'time', 'user')
+
+
+class SuggestSerializer(serializers.ModelSerializer):
+    post = PostSerializer(read_only=True)
+    suggester = UserSerializer(read_only=True)
+    suggest_to = UserSerializer(read_only=True)
+    time = serializers.ReadOnlyField()
+    suggest_to_username = serializers.CharField(write_only=True)
+    post_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = Suggest
+        fields = '__all__'
+
+    def create(self, validated_data):
+        suggested_to = User.objects.get(username=validated_data.get('suggest_to_username'))
+        post = Post.objects.get(pk=validated_data.get('post_id'))
+        return Suggest.objects.create(suggest_to=suggested_to, suggester=validated_data.get('suggester'), post=post)

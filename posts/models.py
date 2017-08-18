@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models import F
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.utils import timezone
 
 
 class Discount(models.Model):
@@ -52,18 +53,33 @@ class Post(models.Model):
         return self.NORMAL_ITEM
 
 
+class Comment(models.Model):
+    time = models.DateTimeField(auto_now_add=True, blank=True)
+    text = models.CharField(max_length=400)
+    user = models.ForeignKey(to=User, related_name='comments')
+    post = models.ForeignKey(to=Post, on_delete=models.CASCADE, related_name='comments')
+
+
+class Suggest(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='suggests')
+    suggester = models.ForeignKey(User, related_name='suggests')
+    suggest_to = models.ForeignKey(User, related_name='suggesteds')
+    time = models.DateTimeField(auto_now_add=True)
+
+
 class Feed(models.Model):
     # we need this because we dont want to override USER object
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
     reposter = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True, related_name='repost_posts')
+    sort_time = models.DateTimeField()
 
     class Meta:
-        ordering = ['-pk']
+        ordering = ['sort_time']
 
 
 @receiver(post_save, sender=Post)
 def create_new_post(sender, instance, created, **kwargs):
     if created:
         for user in instance.sender.follow.followers.all():
-            Feed.objects.create(user=user, post=instance)
+            Feed.objects.create(user=user, post=instance, sort_time=timezone.now())

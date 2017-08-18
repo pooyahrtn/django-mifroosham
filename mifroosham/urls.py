@@ -37,7 +37,10 @@ urlpatterns = [
     url(r'^confirmsell/(?P<pk>[0-9]+)$', ConfirmSell.as_view()),
     url(r'^deliveritem/(?P<pk>[0-9]+)$', DeliverItem.as_view()),
     url(r'^cancelsell/(?P<pk>[0-9]+)$', CancelSell.as_view()),
+    url(r'^comments/(?P<pk>[0-9]+)$', views.Comments.as_view()),
+    url(r'^suggestpost/', views.SuggestPost.as_view()),
     url(r'^(?P<username>[a-z]+)/$', UserDetail.as_view()),
+
 ]
 
 if settings.DEBUG:

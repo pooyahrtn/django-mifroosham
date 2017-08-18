@@ -6,15 +6,16 @@ from  posts.serializers import UserWithPostSerializer
 from rest_framework import generics
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from .exceptions import *
 
 
 def change_follower_feed(follower, who_followed, is_followed):
     if is_followed:
         for post in who_followed.posts.all():
-            Feed.objects.create(user=follower, post=post)
+            Feed.objects.create(user=follower, post=post, sort_time=post.sent_time)
     else:
         for post in who_followed.posts.all():
-            Feed.objects.filter(Q(user=follower) , Q(post=post) | Q(reposter=who_followed)).delete()
+            Feed.objects.filter(Q(user=follower), Q(post=post) | Q(reposter=who_followed)).delete()
 
 
 class FollowUser(generics.UpdateAPIView):
@@ -26,6 +27,8 @@ class FollowUser(generics.UpdateAPIView):
     @transaction.atomic
     def perform_update(self, serializer):
         user = self.get_object()
+        if user.pk == self.request.user:
+            raise FollowException(detail='you cant follow your self')
         following = user.follow.followers.filter(username=self.request.user.username).exists()
         if following:
             user.follow.followers.remove(self.request.user)
