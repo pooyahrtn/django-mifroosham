@@ -16,8 +16,10 @@ class Discount(models.Model):
 
 class Auction(models.Model):
     # post = models.OneToOneField(Post, on_delete=models.CASCADE)
-    highest_suggest = models.BigIntegerField(blank=True)
-    highest_suggester = models.ForeignKey(to=User, null=True, on_delete=models.SET_NULL)
+    highest_suggest = models.BigIntegerField(blank=True, null=True)
+    # highest_suggest_transaction = models.ForeignKey(to=Transaction, blank=True, null=True)
+    # highest_suggest_transaction = models.ForeignKey(Transaction, null=True, blank=True)
+    base_money = models.BigIntegerField(default=0)
     end_time = models.DateTimeField()
 
 
@@ -32,11 +34,11 @@ class Post(models.Model):
     is_charity = models.BooleanField(default=False)
     image_url = models.ImageField()
     description = models.CharField(max_length=600, blank=True)
-    likes = models.ManyToManyField(to=User,blank=True,related_name='likes')
+    likes = models.ManyToManyField(to=User, blank=True, related_name='likes')
     reposters = models.ManyToManyField(to=User, blank=True, related_name='reposts')
     n_likes = models.IntegerField(default=0)
     n_reposters = models.IntegerField(default=0)
-    discount = models.OneToOneField(Discount, on_delete=models.CASCADE,blank=True, null=True)
+    discount = models.OneToOneField(Discount, on_delete=models.CASCADE, blank=True, null=True)
     auction = models.OneToOneField(Auction, on_delete=models.CASCADE, blank=True, null=True)
     disable_after_buy = models.BooleanField(default=True)
     disabled = models.BooleanField(default=False)

@@ -19,7 +19,7 @@ class AuctionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Auction
-        fields = ('highest_suggest', 'highest_suggester', 'end_time')
+        fields = ('highest_suggest', 'highest_suggester', 'end_time', 'base_money')
 
 
 class DiscountSerializer(serializers.ModelSerializer):
@@ -46,6 +46,8 @@ class PostWithoutSenderSerializer(serializers.ModelSerializer):
     n_likes = serializers.IntegerField(read_only=True)
     n_reposters = serializers.IntegerField(read_only=True)
     id = serializers.ReadOnlyField()
+    disabled = serializers.ReadOnlyField()
+
 
     class Meta:
         model = Post

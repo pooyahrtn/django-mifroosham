@@ -1,5 +1,6 @@
 from rest_framework.exceptions import APIException
 
+
 class SoonForCancelException(APIException):
     status_code = 509
     default_code = 'soon_for_cancel'
@@ -34,3 +35,9 @@ class YouAreNotAuthorised(APIException):
     status_code = 515
     default_code = 'you_are_not_authorised'
     default_detail = 'you are not authorised'
+
+
+class MoneyException(APIException):
+    status_code = 519
+    default_code = 'low_money'
+    default_detail = 'you dont have enough money'

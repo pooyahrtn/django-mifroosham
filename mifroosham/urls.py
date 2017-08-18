@@ -19,7 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from posts import views
 from profiles.views import FollowUser, UserDetail
-from transactions.views import TransactionsList, BuyPost, CancelBuy, ConfirmSell, DeliverItem, CancelSell
+from transactions.views import TransactionsList, BuyPost, CancelBuy, ConfirmSell, DeliverItem, CancelSell, AuctionSuggestHigher
 from django.conf.urls import include
 # from profiles.views import UserPosts
 
@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^cancel/(?P<pk>[0-9]+)$', CancelBuy.as_view()),
     url(r'^confirmsell/(?P<pk>[0-9]+)$', ConfirmSell.as_view()),
     url(r'^deliveritem/(?P<pk>[0-9]+)$', DeliverItem.as_view()),
+    url(r'^auctionsuggesthigher/(?P<pk>[0-9]+)$', AuctionSuggestHigher.as_view()),
     url(r'^cancelsell/(?P<pk>[0-9]+)$', CancelSell.as_view()),
     url(r'^comments/(?P<pk>[0-9]+)$', views.Comments.as_view()),
     url(r'^suggestpost/', views.SuggestPost.as_view()),

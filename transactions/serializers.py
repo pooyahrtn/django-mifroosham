@@ -18,3 +18,12 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = '__all__'
+
+
+class AuctionSuggestSerializer(TransactionSerializer):
+    higher_suggest = serializers.IntegerField(write_only=True)
+
+    def create(self, validated_data):
+        transaction = Transaction()
+        transaction.suspended_money = validated_data.get('higher_suggest')
+        return transaction
