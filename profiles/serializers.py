@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('avatar_url',)
+        fields = ('avatar_url', 'bio', 'phone_number')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -15,8 +15,22 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'profile')
+        fields = ('username', 'profile', 'first_name', 'last_name',)
         depth = 1
+
+
+class UserWithoutProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name')
+
+
+class MyProfileSerializer(serializers.ModelSerializer):
+    money = serializers.ReadOnlyField()
+    user = UserWithoutProfileSerializer(read_only=True)
+    class Meta:
+        model = Profile
+        fields = '__all__'
 
 
 class FollowSerializers(serializers.ModelSerializer):

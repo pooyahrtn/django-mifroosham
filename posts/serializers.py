@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from profiles.serializers import UserSerializer, ProfileSerializer
 import time
 from django.utils import timezone
+from .exceptions import *
 
 
 def validate_dicount_time(end_time):
@@ -81,6 +82,7 @@ class RepostPostSerializer(serializers.ModelSerializer):
 
 class PostSerializer(PostWithoutSenderSerializer):
     sender = UserSerializer(read_only=True)
+    sender_type = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Post
@@ -90,17 +92,47 @@ class PostSerializer(PostWithoutSenderSerializer):
     def create(self, validated_data):
         auction_data = validated_data.get('auction')
         discount_data = validated_data.get('discount')
-        if auction_data is not None:
+        sender_type = validated_data.get('sender_type')
+        validated_data.pop('sender_type', None)
+        if sender_type == 2:
+            if auction_data is None:
+                raise SendPostException(detail='auction data cant be null')
             auction = Auction.objects.create(**auction_data)
             validated_data.pop('auction', None)
-            return Post.objects.create(auction=auction, **validated_data)
-        elif discount_data is not None:
+            validated_data.pop('price', None)
+            return Post.objects.create(auction=auction, price=0,**validated_data)
+        elif sender_type == 1:
+            if discount_data is None:
+                raise SendPostException(detail='discount data cant be null')
             validate_dicount_time(discount_data.get('end_time'))
             discount = Discount.objects.create(**discount_data)
             validated_data.pop('discount', None)
-            return Post.objects.create(discount=discount, **validated_data)
+            validated_data.pop('price', None)
+            return Post.objects.create(discount=discount, price=0, **validated_data)
         return Post.objects.create(**validated_data)
 
+    # def update(self, instance, validated_data):
+    #     sender_type = validated_data.get('sender_type')
+    #     if sender_type != instance.post_type:
+    #         return SendPostException('you can not change post type')
+    #
+    #     auction_data = validated_data.get('auction')
+    #     discount_data = validated_data.get('discount')
+    #
+    #     if sender_type == 2:
+    #         if auction_data is None:
+    #             raise SendPostException(detail='auction data cant be null')
+    #         auction = instance.auction
+    #         Auction.objects.filter(pk=auction.pk).update(**auction_data)
+    #         validated_data.pop('auction', None)
+    #         return Post.objects.filter(auction=auction, **validated_data)
+    #     elif sender_type == 1:
+    #         if discount_data is None:
+    #             raise SendPostException(detail='discount data cant be null')
+    #         validate_dicount_time(discount_data.get('end_time'))
+    #         discount = Discount.objects.create(**discount_data)
+    #         validated_data.pop('discount', None)
+    #         return Post.objects.create(discount=discount, **validated_data)
 
 class FeedSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)

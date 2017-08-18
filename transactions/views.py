@@ -50,9 +50,12 @@ class BuyPost(generics.CreateAPIView):
             return Response(data='this post is bought or disabled', status=status.HTTP_403_FORBIDDEN)
         if Transaction.objects.filter(post=post, buyer=self.request.user, status=Transaction.PENDING).exists():
             return Response(data='you bough this shit', status=status.HTTP_302_FOUND)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         price = 0
+        confirmed = False
+        confirm_time = None
         if post.get_post_type() == Post.NORMAL_ITEM:
             price = post.price
             if my_profile.money < price:
@@ -68,10 +71,12 @@ class BuyPost(generics.CreateAPIView):
             else:
                 my_profile.money -= price
                 my_profile.save()
-        # if post.disable_after_buy:
-        #     post.disabled = True
+                confirmed = True
+                confirm_time = timezone.now()
+                post.disabled = post.disable_after_buy
+        post.save()
         serializer.save(buyer=self.request.user, post=post, suspended_money=price,
-                        status=Transaction.PENDING)
+                        status=Transaction.PENDING, confirmed=confirmed, confirm_time=confirm_time)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -204,6 +209,7 @@ class AuctionSuggestHigher(generics.CreateAPIView):
         buyer_profile.save()
         auction.save()
         trans.confirmed = True
+        trans.confirm_time = timezone.now()
         trans.save()
 
 

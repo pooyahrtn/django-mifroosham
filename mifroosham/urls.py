@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from posts import views
-from profiles.views import FollowUser, UserDetail
+from profiles.views import FollowUser, UserDetail, MyProfile
 from transactions.views import TransactionsList, BuyPost, CancelBuy, ConfirmSell, DeliverItem, CancelSell, AuctionSuggestHigher
 from django.conf.urls import include
 # from profiles.views import UserPosts
@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^cancelsell/(?P<pk>[0-9]+)$', CancelSell.as_view()),
     url(r'^comments/(?P<pk>[0-9]+)$', views.Comments.as_view()),
     url(r'^suggestpost/', views.SuggestPost.as_view()),
+    url(r'^myprofile/', MyProfile.as_view()),
     url(r'^(?P<username>[a-z]+)/$', UserDetail.as_view()),
 ]
 urlpatterns += [

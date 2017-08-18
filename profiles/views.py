@@ -1,7 +1,7 @@
 from django.db.models import Q
 from posts.models import Feed
-from .models import User
-from .serializers import UserSerializer, FollowSerializers
+from .models import User, Profile
+from .serializers import MyProfileSerializer, FollowSerializers
 from  posts.serializers import UserWithPostSerializer
 from rest_framework import generics
 from django.db import transaction
@@ -49,3 +49,16 @@ class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserWithPostSerializer
     lookup_field = 'username'
+
+
+class MyProfile(generics.RetrieveUpdateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = MyProfileSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOfProfile)
+
+    def get_object(self):
+        return Profile.objects.get(user=self.request.user)
+
+
+
+
