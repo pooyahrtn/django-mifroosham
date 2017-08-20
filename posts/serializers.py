@@ -97,6 +97,7 @@ class PostSerializer(PostWithoutSenderSerializer):
         if sender_type == 2:
             if auction_data is None:
                 raise SendPostException(detail='auction data cant be null')
+            validate_dicount_time(discount_data.get('end_time'))
             auction = Auction.objects.create(**auction_data)
             validated_data.pop('auction', None)
             validated_data.pop('price', None)

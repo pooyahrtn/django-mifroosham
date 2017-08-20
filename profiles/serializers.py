@@ -28,6 +28,7 @@ class UserWithoutProfileSerializer(serializers.ModelSerializer):
 class MyProfileSerializer(serializers.ModelSerializer):
     money = serializers.ReadOnlyField()
     user = UserWithoutProfileSerializer(read_only=True)
+
     class Meta:
         model = Profile
         fields = '__all__'

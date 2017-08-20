@@ -14,9 +14,10 @@ from .permissions import *
 class FeedList(generics.ListAPIView):
     queryset = Feed.objects.all()
     serializer_class = FeedSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        return self.request.user.feed_set.all()
+        return self.request.user.feed_set.filter(post__disabled=False)
 
 
 class LikePost(generics.UpdateAPIView):

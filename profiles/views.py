@@ -1,4 +1,6 @@
 from django.db.models import Q
+from rest_framework.response import Response
+
 from posts.models import Feed
 from .models import User, Profile
 from .serializers import MyProfileSerializer, FollowSerializers
@@ -49,6 +51,16 @@ class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserWithPostSerializer
     lookup_field = 'username'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        if not self.request.user.is_anonymous:
+            data['following'] = self.request.user.followings.filter(user=self.get_object()).exists()
+        return Response(data)
+
 
 
 class MyProfile(generics.RetrieveUpdateAPIView):

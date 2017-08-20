@@ -77,7 +77,7 @@ class Feed(models.Model):
     sort_time = models.DateTimeField()
 
     class Meta:
-        ordering = ['sort_time']
+        ordering = ['-sort_time']
 
 
 @receiver(post_save, sender=Post)

@@ -212,7 +212,7 @@ class AuctionSuggestHigher(generics.CreateAPIView):
         trans.confirm_time = timezone.now()
         trans.save()
 
-
-class TransactionsList(generics.ListAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
+#
+# class TransactionsList(generics.ListAPIView):
+#     queryset = Transaction.objects.all()
+#     serializer_class = TransactionSerializer
