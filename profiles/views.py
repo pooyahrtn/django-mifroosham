@@ -2,7 +2,7 @@ from django.db.models import Q
 from posts.models import Feed
 from .models import User, Profile
 from .serializers import MyProfileSerializer, FollowSerializers
-from  posts.serializers import UserWithPostSerializer
+from posts.serializers import UserWithPostSerializer
 from rest_framework import generics
 from django.db import transaction
 from django.shortcuts import get_object_or_404
