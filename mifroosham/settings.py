@@ -25,7 +25,7 @@ SECRET_KEY = 'kb2_u(-ji523%g-1izv*jm^ym_uje*si8q=6me4#qi)_@aq1=j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

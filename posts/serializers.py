@@ -49,7 +49,6 @@ class PostWithoutSenderSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
     disabled = serializers.ReadOnlyField()
 
-
     class Meta:
         model = Post
         exclude = ('sender', 'likes', 'reposters')
@@ -159,7 +158,7 @@ class UserWithPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('posts', 'profile','username')
+        fields = ('posts', 'profile', 'username')
         depth = 2
 
 

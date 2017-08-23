@@ -1,15 +1,17 @@
 from django.db.models import Q
+from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
 from posts.models import Feed
 from .models import User, Profile
-from .serializers import MyProfileSerializer, FollowSerializers
+from .serializers import *
 from posts.serializers import UserWithPostSerializer
 from rest_framework import generics
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from .exceptions import *
 from .permissions import *
+from rest_framework.authtoken import views
 
 
 def change_follower_feed(follower, who_followed, is_followed):
@@ -62,7 +64,6 @@ class UserDetail(generics.RetrieveAPIView):
         return Response(data)
 
 
-
 class MyProfile(generics.RetrieveUpdateAPIView):
     queryset = Profile.objects.all()
     serializer_class = MyProfileSerializer
@@ -70,6 +71,29 @@ class MyProfile(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
+
+
+class UpdateProfilePhoto(generics.UpdateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = UpdateProfilePhotoSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOfProfile)
+
+    def get_object(self):
+        return Profile.objects.get(user=self.request.user)
+
+
+class SignUp(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = AuthenticationSerializer
+
+
+class Login(views.ObtainAuthToken):
+    pass
+
+
+
+
+
 
 
 
