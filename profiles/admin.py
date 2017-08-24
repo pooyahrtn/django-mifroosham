@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Profile, Follow
+from .models import Profile, Follow, PhoneNumberConfirmation, PhoneNumber
 
 
 # class ProfileInline(admin.StackedInline):
@@ -26,6 +26,14 @@ from .models import Profile, Follow
 class ProfileAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(PhoneNumberConfirmation)
+class PhoneConfirmation(admin.ModelAdmin):
+    pass
+
+admin.site.register(PhoneNumber)

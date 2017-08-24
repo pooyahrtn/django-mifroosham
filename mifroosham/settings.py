@@ -137,3 +137,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT= ['json']
+CELERY_TIME_ZONE = 'UTC'
+CELERY_ENABLE_UTC = True
+

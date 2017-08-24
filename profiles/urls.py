@@ -10,5 +10,6 @@ urlpatterns = [
     url(r'^update_photo/$', UpdateProfilePhoto.as_view()),
     url(r'^sign_up/$', SignUp.as_view()),
     url(r'^login/$', Login.as_view()),
+    url(r'^request_confirmation/$', RequestConfirmation.as_view(), name='request_login'),
     # url(r'^api-token-auth/', views.obtain_auth_token)
 ]

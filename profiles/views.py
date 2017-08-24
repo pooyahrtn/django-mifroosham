@@ -1,17 +1,21 @@
+import random
+
 from django.db.models import Q
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from posts.models import Feed
-from .models import User, Profile
+from .models import User, Profile, PhoneNumberConfirmation
 from .serializers import *
 from posts.serializers import UserWithPostSerializer
-from rest_framework import generics
+from rest_framework import generics, parsers, renderers
 from django.db import transaction
-from django.shortcuts import get_object_or_404
+from .tasks import send_sms, test
 from .exceptions import *
 from .permissions import *
-from rest_framework.authtoken import views
+import requests
+import datetime
 
 
 def change_follower_feed(follower, who_followed, is_followed):
@@ -84,17 +88,55 @@ class UpdateProfilePhoto(generics.UpdateAPIView):
 
 class SignUp(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = AuthenticationSerializer
+    serializer_class = SignUpSerializer
+
+    @transaction.atomic
+    def perform_create(self, serializer):
+        user = serializer.save()
+        code = random.randint(100000, 999999)
+        PhoneNumberConfirmation.objects.create(user=user, confirm_code=code)
+        send_sms.delay(user.phone_number.number, code)
 
 
-class Login(views.ObtainAuthToken):
-    pass
+class RequestConfirmation(APIView):
+    throttle_classes = ()
+    permission_classes = ()
+    parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
+    renderer_classes = (renderers.JSONRenderer,)
+    serializer_class = RequestConfirmation
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        code = random.randint(100000, 999999)
+
+        phone_confirmation = user.phone_confirmation
+        if phone_confirmation:
+            now = datetime.datetime.now(datetime.timezone.utc)
+            delta_time = now - phone_confirmation.last_request_time
+            if delta_time < datetime.timedelta(minutes=1):
+                return Response({'sent': False, 'reason': 'you just requested'})
+            phone_confirmation.confirm_code = code
+            phone_confirmation.last_request_time = now
+            phone_confirmation.save()
+        else:
+            PhoneNumberConfirmation.objects.create(user=user, confirm_code=code)
+        send_sms.delay(user.phone_number.number, code)
+
+        return Response({'sent': True})
 
 
+class Login(APIView):
+    throttle_classes = ()
+    permission_classes = ()
+    parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
+    renderer_classes = (renderers.JSONRenderer,)
+    serializer_class = AuthTokenSerializer
 
-
-
-
-
-
-
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})
