@@ -46,12 +46,11 @@ class PostWithoutSenderSerializer(serializers.ModelSerializer):
     image_url = serializers.CharField()
     n_likes = serializers.IntegerField(read_only=True)
     n_reposters = serializers.IntegerField(read_only=True)
-    id = serializers.ReadOnlyField()
     disabled = serializers.ReadOnlyField()
 
     class Meta:
         model = Post
-        exclude = ('sender', 'likes', 'reposters')
+        exclude = ('sender', 'likes', 'reposters', 'id')
         depth = 1
 
 
@@ -64,7 +63,7 @@ class LikePostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('pk', 'title', 'user', 'liked', 'n_likes','n_reposters')
+        fields = ('uuid', 'title', 'user', 'liked', 'n_likes','n_reposters')
 
 
 class RepostPostSerializer(serializers.ModelSerializer):
@@ -76,7 +75,7 @@ class RepostPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('pk', 'title', 'user', 'reposted', 'n_likes','n_reposters')
+        fields = ('uuid', 'title', 'user', 'reposted', 'n_likes','n_reposters')
 
 
 class PostSerializer(PostWithoutSenderSerializer):
@@ -85,7 +84,7 @@ class PostSerializer(PostWithoutSenderSerializer):
 
     class Meta:
         model = Post
-        exclude = ('likes', 'reposters')
+        exclude = ('likes', 'reposters', 'id')
         depth = 1
 
     def create(self, validated_data):
@@ -149,7 +148,7 @@ class PostDetailSerializer(PostSerializer):
 
     class Meta:
         model = Post
-        exclude = ('likes',)
+        exclude = ('likes', 'id')
 
 
 class UserWithPostSerializer(serializers.ModelSerializer):

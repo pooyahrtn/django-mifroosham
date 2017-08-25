@@ -11,7 +11,7 @@ from .serializers import *
 from posts.serializers import UserWithPostSerializer
 from rest_framework import generics, parsers, renderers
 from django.db import transaction
-from .tasks import send_sms, test
+from .tasks import send_sms
 from .exceptions import *
 from .permissions import *
 import requests

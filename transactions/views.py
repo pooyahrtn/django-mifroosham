@@ -1,13 +1,14 @@
 from django.db.models import F
 from django.db.models import Q
-from django.shortcuts import render
+from rest_framework.views import APIView
 
 from profiles.models import Profile
 from .models import Transaction
 from rest_framework import generics
 from django.db import transaction
 from posts.models import Post, Auction, Discount
-from .serializers import TransactionSerializer, AuctionSuggestSerializer
+from .serializers import TransactionSerializer, BuyTransactionSerializer, \
+    GetTransactionSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,6 +16,7 @@ import time
 from django.utils import timezone
 from .exceptions import *
 from .permissions import *
+import datetime
 
 
 def calculate_discount_current_price(discount):
@@ -26,22 +28,16 @@ def calculate_discount_current_price(discount):
     return int(discount.start_price + fraction * (discount.real_price - discount.start_price))
 
 
-def get_delta_hours(from_date):
-    start_time = int(time.mktime(from_date.timetuple()))
-    return int((int(time.time()) - start_time) / (24 * 60 * 60))
-
-
-class BuyPost(generics.CreateAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
-    lookup_field = 'post_pk'
+class BuyPost(APIView):
+    serializer_class = BuyTransactionSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    # attention! I do really scare of race condition.
-
     @transaction.atomic
-    def create(self, request, *args, **kwargs):
-        post = get_object_or_404(Post.objects.select_for_update(), pk=self.kwargs['post_pk'])
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        post = serializer.validated_data['post']
+        reposter = serializer.validated_data['reposter']
         me = self.request.user
         my_profile = get_object_or_404(Profile.objects.select_for_update(), user_id=me.pk)
         if post.sender.username == me.username:
@@ -51,11 +47,6 @@ class BuyPost(generics.CreateAPIView):
         if Transaction.objects.filter(post=post, buyer=self.request.user, status=Transaction.PENDING).exists():
             return Response(data='you bough this shit', status=status.HTTP_302_FOUND)
 
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        price = 0
-        confirmed = False
-        confirm_time = None
         if post.get_post_type() == Post.NORMAL_ITEM:
             price = post.price
             if my_profile.money < price:
@@ -71,136 +62,191 @@ class BuyPost(generics.CreateAPIView):
             else:
                 my_profile.money -= price
                 my_profile.save()
-                confirmed = True
-                confirm_time = timezone.now()
-                post.disabled = post.disable_after_buy
+        else:
+            return Response(data='not allowed', status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        post.disabled = post.disable_after_buy
         post.save()
-        serializer.save(buyer=self.request.user, post=post, suspended_money=price,
-                        status=Transaction.PENDING, confirmed=confirmed, confirm_time=confirm_time)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        Transaction.objects.create(buyer=self.request.user, post=post, suspended_money=price,
+                        status=Transaction.PENDING, reposter=reposter)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    #
+    # @transaction.atomic
+    # def create(self, request, *args, **kwargs):
+    #     post = get_object_or_404(Post.objects.select_for_update(), uuid=self.kwargs['post_uuid'])
+    #     me = self.request.user
+    #     my_profile = get_object_or_404(Profile.objects.select_for_update(), user_id=me.pk)
+    #     if post.sender.username == me.username:
+    #         return Response(data='dude you cant do in jib too oon jib', status=status.HTTP_403_FORBIDDEN)
+    #     if post.disabled:
+    #         return Response(data='this post is bought or disabled', status=status.HTTP_403_FORBIDDEN)
+    #     if Transaction.objects.filter(post=post, buyer=self.request.user, status=Transaction.PENDING).exists():
+    #         return Response(data='you bough this shit', status=status.HTTP_302_FOUND)
+    #
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     price = 0
+    #     # confirmed = False
+    #     # confirm_time = None
+    #     if post.get_post_type() == Post.NORMAL_ITEM:
+    #         price = post.price
+    #         if my_profile.money < price:
+    #             return Response(data='low money', status=status.HTTP_406_NOT_ACCEPTABLE)
+    #         else:
+    #             my_profile.money -= price
+    #             my_profile.save()
+    #     elif post.get_post_type() == Post.DISCOUNT_ITEM:
+    #         discount = get_object_or_404(Discount, pk=post.discount.pk)
+    #         price = calculate_discount_current_price(discount)
+    #         if my_profile.money < price:
+    #             return Response(data='low money', status=status.HTTP_406_NOT_ACCEPTABLE)
+    #         else:
+    #             my_profile.money -= price
+    #             my_profile.save()
+    #             # confirmed = True
+    #             # confirm_time = timezone.now()
+    #             post.disabled = post.disable_after_buy
+    #     post.save()
+    #     serializer.save(buyer=self.request.user, post=post, suspended_money=price,
+    #                     status=Transaction.PENDING)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class CancelBuy(generics.UpdateAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
+class CancelBuy(APIView):
+    serializer_class = GetTransactionSerializer
     permission_classes = (permissions.IsAuthenticated, IsBuyerOfTransaction)
 
     @transaction.atomic
-    def perform_update(self, serializer):
-        post = self.get_object().post
-        trans = self.get_object()
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        trans = serializer.validated_data['transaction']
         if trans.buyer.pk != self.request.user.pk:
             raise YouAreNotAuthorised()
-
-        if trans.confirmed:
-            if get_delta_hours(trans.confirm_time) < post.deliver_time:
-                raise SoonForCancelException()
+        now = timezone.now()
+        if now - trans.time < datetime.timedelta(hours=trans.post.deliver_time):
+            raise SoonForCancelException()
         if trans.status == Transaction.CANCELED:
             raise AlreadyCanceled()
         self.request.user.profile.money += trans.suspended_money
         Profile.objects.filter(user_id=self.request.user.pk).update(money=F('money') + trans.suspended_money)
-        serializer.save(status=Transaction.CANCELED, cancel_time=timezone.now())
+        trans.cancel_time = timezone.now()
+        trans.save()
+        return Response(serializer.data, status.HTTP_200_OK)
 
 
-class ConfirmSell(generics.UpdateAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOfTransactionsPost)
 
-    @transaction.atomic
-    def perform_update(self, serializer):
-        trans = self.get_object()
-        if trans.post.sender.pk != self.request.user.pk:
-            raise YouAreNotAuthorised()
+# class ConfirmSell(generics.UpdateAPIView):
+#     queryset = Transaction.objects.all()
+#     serializer_class = TransactionSerializer
+#     permission_classes = (permissions.IsAuthenticated, IsOwnerOfTransactionsPost)
+#     lookup_field = 'uuid'
+#
+#     @transaction.atomic
+#     def perform_update(self, serializer):
+#         trans = self.get_object()
+#         if trans.post.sender.pk != self.request.user.pk:
+#             raise YouAreNotAuthorised()
+#         if trans.confirmed:
+#             raise AlreadyConfirmed()
+#         if trans.status == Transaction.CANCELED or trans.status == Transaction.DELIVERED:
+#             raise AlreadyCanceled()
+#         if trans.post.disable_after_buy:
+#             trans.post.disabled = True
+#             trans.post.save()
+#             for other_user_transaction in Transaction.objects.filter(Q(post=trans.post), Q(status=Transaction.PENDING),
+#                                                                      ~Q(pk=trans.pk)):
+#                 Profile.objects.filter(user_id=other_user_transaction.buyer.pk). \
+#                     update(money=F('money') + other_user_transaction.suspended_money)
+#         serializer.save(confirmed=True, confirm_time=timezone.now())
+#
 
-        if trans.confirmed:
-            raise AlreadyConfirmed()
-        if trans.status == Transaction.CANCELED or trans.status == Transaction.DELIVERED:
-            raise AlreadyCanceled()
-        if trans.post.disable_after_buy:
-            trans.post.disabled = True
-            trans.post.save()
-            for other_user_transaction in Transaction.objects.filter(Q(post=trans.post), Q(status=Transaction.PENDING),
-                                                                     ~Q(pk=trans.pk)):
-                Profile.objects.filter(user_id=other_user_transaction.buyer.pk). \
-                    update(money=F('money') + other_user_transaction.suspended_money)
-        serializer.save(confirmed=True, confirm_time=timezone.now())
-
-
-class DeliverItem(generics.UpdateAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
+class DeliverItem(APIView):
+    serializer_class = GetTransactionSerializer
     permission_classes = (permissions.IsAuthenticated, IsBuyerOfTransaction)
 
     @transaction.atomic
-    def perform_update(self, serializer):
-        trans = self.get_object()
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        trans = serializer.validated_data['transaction']
         if trans.buyer.pk != self.request.user.pk:
             raise YouAreNotAuthorised()
-        if not trans.confirmed:
-            raise HasNotConfirmed()
         if trans.status == Transaction.DELIVERED:
             raise AlreadyDelivered()
         if trans.status == Transaction.CANCELED:
             raise AlreadyCanceled()
         seller = trans.post.sender
-        Profile.objects.filter(user_id=seller.pk).update(money=F('money') + trans.suspended_money)
-        serializer.save(status=Transaction.DELIVERED, deliver_time=timezone.now())
+        reposter = trans.reposter
+        if reposter:
+            Profile.objects.filter(user_id=reposter.pk).update(money=F('money') + trans.suspended_money * 0.1)
+        else:
+            Profile.objects.filter(user__username='pooya').update(money=F('money') + trans.suspended_money * 0.1)
+        Profile.objects.filter(user_id=seller.pk).update(money=F('money') + trans.suspended_money * 0.9)
+        trans.status=Transaction.DELIVERED
+        trans.deliver_time=timezone.now()
+        trans.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CancelSell(generics.UpdateAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
+class CancelSell(APIView):
+    serializer_class = GetTransactionSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOfTransactionsPost)
 
+
     @transaction.atomic
-    def perform_update(self, serializer):
-        trans = self.get_object()
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        trans = serializer.validated_data['transaction']
         if trans.post.sender.pk != self.request.user.pk:
             raise YouAreNotAuthorised()
         if trans.status == Transaction.DELIVERED:
             raise AlreadyDelivered()
         if trans.status == Transaction.CANCELED:
             raise AlreadyCanceled()
-        if not trans.confirmed:
-            raise AlreadyConfirmed()
+            # if not trans.confirmed:
+            #     raise AlreadyConfirmed()
         buyer = trans.buyer
         Profile.objects.filter(user_id=buyer.pk).update(money=F('money') + trans.suspended_money)
-        serializer.save(status=Transaction.CANCELED, cancel_time=timezone.now())
+        trans.status=Transaction.CANCELED
+        trans.cancel_time = timezone.now()
+        trans.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class AuctionSuggestHigher(generics.CreateAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class = AuctionSuggestSerializer
+class AuctionSuggestHigher(APIView):
+
+    serializer_class = BuyTransactionSerializer
     permission_classes = (permissions.IsAuthenticated, IsNotOwnerOfPost)
 
     @transaction.atomic
-    def perform_create(self, serializer):
-        buyer = self.request.user
-        buyer_profile = get_object_or_404(Profile.objects.select_for_update(), pk=buyer.pk)
-        post = get_object_or_404(Post.objects.select_for_update(), pk=self.kwargs['pk'])
-        trans = serializer.save()
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        post = serializer.validated_data['post']
+        higher_suggest = serializer.validated_data['higher_suggest']
+        reposter = serializer.validated_data['reposter']
+        buyer_profile = get_object_or_404(Profile.objects.select_for_update(), pk=self.request.user.pk)
         auction = get_object_or_404(Auction.objects.select_for_update(), pk=post.auction_id)
-
-        if trans.suspended_money > buyer_profile.money:
+        if higher_suggest > buyer_profile.money:
             raise MoneyException()
 
-        # people who attempted buy this post but they have lower suggest.(normally it should be one person)
-        this_post_buyers = Transaction.objects.filter(post=post, status=Transaction.PENDING).order_by('-suspended_money')
+            # people who attempted buy this post but they have lower suggest.(normally it should be one person)
+        this_post_buyers = Transaction.objects.filter(post=post, status=Transaction.PENDING).order_by(
+            '-suspended_money')
 
         if this_post_buyers.count() > 0:
             min_price = this_post_buyers[0].suspended_money + 1
         else:
             min_price = auction.base_money
 
-        if trans.suspended_money < min_price:
+        if higher_suggest < min_price:
             raise MoneyException()
 
-        trans.buyer = buyer
-        trans.post = post
-        auction.highest_suggest = trans.suspended_money
-        buyer_profile.money -= trans.suspended_money
+        auction.highest_suggest = higher_suggest
+        buyer_profile.money -= higher_suggest
         for last_transaction in this_post_buyers:
             his_suspended_money = last_transaction.suspended_money
             last_transaction.status = Transaction.CANCELED
@@ -208,11 +254,52 @@ class AuctionSuggestHigher(generics.CreateAPIView):
             last_transaction.save()
         buyer_profile.save()
         auction.save()
-        trans.confirmed = True
-        trans.confirm_time = timezone.now()
-        trans.save()
+        Transaction.objects.create(buyer=self.request.user, post=post, reposter=reposter)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-#
-# class TransactionsList(generics.ListAPIView):
-#     queryset = Transaction.objects.all()
-#     serializer_class = TransactionSerializer
+    #
+    # @transaction.atomic
+    # def perform_create(self, serializer):
+    #     buyer = self.request.user
+    #     buyer_profile = get_object_or_404(Profile.objects.select_for_update(), pk=buyer.pk)
+    #     post = get_object_or_404(Post.objects.select_for_update(), pk=self.kwargs['pk'])
+    #     trans = serializer.save()
+    #     auction = get_object_or_404(Auction.objects.select_for_update(), pk=post.auction_id)
+    #
+    #     if trans.suspended_money > buyer_profile.money:
+    #         raise MoneyException()
+    #
+    #     # people who attempted buy this post but they have lower suggest.(normally it should be one person)
+    #     this_post_buyers = Transaction.objects.filter(post=post, status=Transaction.PENDING).order_by('-suspended_money')
+    #
+    #     if this_post_buyers.count() > 0:
+    #         min_price = this_post_buyers[0].suspended_money + 1
+    #     else:
+    #         min_price = auction.base_money
+    #
+    #     if trans.suspended_money < min_price:
+    #         raise MoneyException()
+    #
+    #     trans.buyer = buyer
+    #     trans.post = post
+    #     auction.highest_suggest = trans.suspended_money
+    #     buyer_profile.money -= trans.suspended_money
+    #     for last_transaction in this_post_buyers:
+    #         his_suspended_money = last_transaction.suspended_money
+    #         last_transaction.status = Transaction.CANCELED
+    #         Profile.objects.filter(user_id=last_transaction.buyer.pk).update(money=F('money') + his_suspended_money)
+    #         last_transaction.save()
+    #     buyer_profile.save()
+    #     auction.save()
+    #     # trans.confirmed = True
+    #     # trans.confirm_time = timezone.now()
+    #     trans.save()
+
+
+class MyTransactions(generics.ListAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def filter_queryset(self, queryset):
+        return Transaction.objects.filter(Q(buyer=self.request.user)|Q(post__sender=self.request.user))

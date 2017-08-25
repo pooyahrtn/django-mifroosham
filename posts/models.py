@@ -4,6 +4,7 @@ from django.db.models import F
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils import timezone
+import uuid as uuid_lib
 
 
 class Discount(models.Model):
@@ -27,6 +28,10 @@ class Post(models.Model):
     NORMAL_ITEM = 0
     DISCOUNT_ITEM = 1
     AUCTION_ITEM = 2
+    uuid = models.UUIDField(
+        db_index=True,
+        default=uuid_lib.uuid4,
+        editable=False)
     sender = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='posts')
     sent_time = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100)
@@ -70,7 +75,10 @@ class Suggest(models.Model):
 
 
 class Feed(models.Model):
-    # we need this because we dont want to override USER object
+    uuid = models.UUIDField(
+        db_index=True,
+        default=uuid_lib.uuid4,
+        editable=False)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
     reposter = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True, related_name='repost_posts')
