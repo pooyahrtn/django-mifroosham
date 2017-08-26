@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'profiles.apps.ProfilesConfig',
     'transactions.apps.TransactionsConfig',
     'reports.apps.ReportsConfig',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'notifications.apps.NotificationsConfig'
 ]
 
 MIDDLEWARE = [

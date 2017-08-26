@@ -13,7 +13,7 @@ class Profile(models.Model):
     # phone_number = models.CharField(max_length=15, blank=True, null=True)
     location = models.CharField(max_length=200, blank=True, null=True)
     show_phone_number = models.BooleanField(default=False)
-    full_name = models.CharField(blank=True, null=True, max_length=40)
+    full_name = models.CharField(null=True, max_length=40)
 
     def __str__(self):
         return self.user.username

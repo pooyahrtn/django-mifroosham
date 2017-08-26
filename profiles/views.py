@@ -92,6 +92,8 @@ class SignUp(generics.CreateAPIView):
 
     @transaction.atomic
     def perform_create(self, serializer):
+        if User.objects.filter(username=serializer.validated_data.get('username')).exists():
+            raise exceptions.CreateUserException()
         user = serializer.save()
         code = random.randint(100000, 999999)
         PhoneNumberConfirmation.objects.create(user=user, confirm_code=code)

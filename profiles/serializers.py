@@ -1,8 +1,9 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-
+from . import exceptions
 from .models import Profile, PhoneNumber, PhoneNumberConfirmation
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -23,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserWithoutProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username')
+        fields = ('username', )
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -44,7 +45,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ('money', 'user', 'full_name', 'show_phone_number', 'location', 'bio')
 
 
 class UpdateProfilePhotoSerializer(serializers.ModelSerializer):
@@ -110,7 +111,10 @@ class AuthTokenSerializer(serializers.Serializer):
                 # From Django 1.10 onwards the `authenticate` call simply
                 # returns `None` for is_active=False users.
                 # (Assuming the default `ModelBackend` authentication backend.)
-                if confirm_code != PhoneNumberConfirmation.objects.get(user=user).confirm_code:
+                phone_confirmation = PhoneNumberConfirmation.objects.get(user=user)
+                if timezone.now() - phone_confirmation.last_request_time > timezone.timedelta(minutes=5):
+                    raise serializers.ValidationError('please request again', code=503)
+                if confirm_code != phone_confirmation.confirm_code:
                     msg = 'bad confirmation code'
                     raise serializers.ValidationError(msg, code='authorization')
                 if not user.is_active:
