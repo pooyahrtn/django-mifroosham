@@ -1,7 +1,6 @@
 from django.db.models import F
 from django.db.models import Q
 from rest_framework.views import APIView
-
 from profiles.models import Profile
 from .models import Transaction
 from rest_framework import generics
@@ -17,6 +16,7 @@ from django.utils import timezone
 from .exceptions import *
 from .permissions import *
 import datetime
+from notifications.models import  TransactionNotification
 
 
 def calculate_discount_current_price(discount):
@@ -66,8 +66,10 @@ class BuyPost(APIView):
             return Response(data='not allowed', status=status.HTTP_405_METHOD_NOT_ALLOWED)
         post.disabled = post.disable_after_buy
         post.save()
-        Transaction.objects.create(buyer=self.request.user, post=post, suspended_money=price,
+        trans = Transaction.objects.create(buyer=self.request.user, post=post, suspended_money=price,
                         status=Transaction.PENDING, reposter=reposter)
+        TransactionNotification.objects.create_notification(transaction=trans, user=me, status=TransactionNotification.BUY)
+        TransactionNotification.objects.create_notification(transaction=trans, user=post.sender, status=TransactionNotification.SELL)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     #

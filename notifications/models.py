@@ -3,6 +3,14 @@ import uuid as uuid_lib
 from transactions.models import Transaction
 from profiles.models import User
 from posts.models import Post
+from . import tasks
+
+
+class TransactionNotificationManager(models.Manager):
+    def create_notification(self, transaction, user, status):
+        notification = self.model(transaction=transaction, user=user, status=status)
+        notification.save()
+        tasks.send_notification_sms.delay(phone_number=user.phone_number.number, status=status, deliver_time=transaction.post.deliver_time)
 
 
 class TransactionNotification(models.Model):
@@ -26,6 +34,9 @@ class TransactionNotification(models.Model):
     transaction = models.ForeignKey(Transaction)
     read = models.BooleanField(default=False)
     user = models.ForeignKey(User, related_name='transaction_notifications')
+    # Todo: remove null = true
+    time = models.DateTimeField(auto_now_add=True, null=True)
+    objects = TransactionNotificationManager()
 
 
 class PostNotification(models.Model):
