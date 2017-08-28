@@ -11,6 +11,7 @@ class TransactionNotificationManager(models.Manager):
         notification = self.model(transaction=transaction, user=user, status=status)
         notification.save()
         tasks.send_notification_sms.delay(phone_number=user.phone_number.number, status=status, deliver_time=transaction.post.deliver_time)
+        tasks.send_push_notification.delay(id=user.notification_token.token, status=status, title=transaction.post.title)
 
 
 class TransactionNotification(models.Model):
@@ -57,3 +58,19 @@ class PostNotification(models.Model):
     post = models.ForeignKey(Post)
     user = models.ForeignKey(User, related_name='posts_notifications')
     read = models.BooleanField(default=False)
+
+
+class FollowNotification(models.Model):
+    user = models.ForeignKey(User, related_name='follow_notifications')
+    follower = models.ForeignKey(User, related_name='following_notifications')
+    time = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
+
+class NotificationToken(models.Model):
+    user = models.OneToOneField(User, related_name='notification_token')
+    # todo: remove null
+    token = models.UUIDField(null=True)
+
+    def __str__(self):
+        return self.user.username

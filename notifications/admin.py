@@ -1,4 +1,5 @@
 from django.contrib import admin
-from .models import TransactionNotification
+from .models import TransactionNotification, NotificationToken
 
 admin.site.register(TransactionNotification)
+admin.site.register(NotificationToken)
