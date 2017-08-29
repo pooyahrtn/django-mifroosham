@@ -22,19 +22,14 @@ class GetNotifications(generics.ListAPIView):
     pass
 
 
-class TestNotification(APIView):
-    def post(self, request, *args, **kwargs):
-        url = 'https://onesignal.com/api/v1/notifications'
-        headers = {'Content-type': 'application/json'}
+class TransactionNotifications(generics.ListAPIView):
 
-        text = 'morghe pokhte' + ' فروخته شد.'
-        body = {
-            "include_player_ids": [str(self.request.user.notification_token.token),],
-            "app_id": "d55c41b1-3107-44f5-a9b6-49acbd1cb07f",
-            "contents": {"en": text}
-        }
-        req = requests.post(url, json.dumps(body), headers=headers)
-        return Response(req)
+    queryset = models.TransactionNotification
+    serializer_class = serializers.TransactionNotificationSerializer
+
+    def filter_queryset(self, queryset):
+        return models.TransactionNotification.objects.filter(user=self.request.user)
+
 
 
 

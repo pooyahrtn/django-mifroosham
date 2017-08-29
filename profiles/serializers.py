@@ -9,7 +9,7 @@ from django.utils import timezone
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('avatar_url', 'bio')
+        fields = ('avatar_url', 'bio', 'full_name')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -45,7 +45,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('money', 'user', 'full_name', 'show_phone_number', 'location', 'bio')
+        fields = ('money', 'avatar_url' ,'user', 'full_name', 'show_phone_number', 'location', 'bio')
 
 
 class UpdateProfilePhotoSerializer(serializers.ModelSerializer):
