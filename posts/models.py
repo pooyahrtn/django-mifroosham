@@ -6,6 +6,8 @@ from django.db.models.signals import post_save
 from django.utils import timezone
 import uuid as uuid_lib
 
+from django.utils.safestring import mark_safe
+
 
 class Discount(models.Model):
     # post = models.OneToOneField(Post,on_delete=models.CASCADE)
@@ -16,10 +18,7 @@ class Discount(models.Model):
 
 
 class Auction(models.Model):
-    # post = models.OneToOneField(Post, on_delete=models.CASCADE)
     highest_suggest = models.BigIntegerField(blank=True, null=True)
-    # highest_suggest_transaction = models.ForeignKey(to=Transaction, blank=True, null=True)
-    # highest_suggest_transaction = models.ForeignKey(Transaction, null=True, blank=True)
     base_money = models.BigIntegerField(default=0)
     end_time = models.DateTimeField()
 
@@ -41,13 +40,15 @@ class Post(models.Model):
     description = models.CharField(max_length=600, blank=True)
     likes = models.ManyToManyField(to=User, blank=True, related_name='likes')
     reposters = models.ManyToManyField(to=User, blank=True, related_name='reposts')
-    n_likes = models.IntegerField(default=0)
-    n_reposters = models.IntegerField(default=0)
+    n_likes = models.IntegerField(default=0, editable=False)
+    n_reposters = models.IntegerField(default=0, editable=False)
     discount = models.OneToOneField(Discount, on_delete=models.CASCADE, blank=True, null=True)
     auction = models.OneToOneField(Auction, on_delete=models.CASCADE, blank=True, null=True)
     disable_after_buy = models.BooleanField(default=True)
     disabled = models.BooleanField(default=False)
     deliver_time = models.IntegerField(default=24)
+    confirmed_to_show = models.BooleanField(default=False)
+    waiting_to_confirm = models.BooleanField(default=True, editable=False)
 
     def __str__(self):
         return self.title
@@ -58,6 +59,11 @@ class Post(models.Model):
         elif self.discount is not None:
             return self.DISCOUNT_ITEM
         return self.NORMAL_ITEM
+
+    def image_tag(self):
+        return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.image_url)
+
+    image_tag.short_description = 'Image'
 
 
 class Comment(models.Model):
@@ -90,6 +96,8 @@ class Feed(models.Model):
 
 @receiver(post_save, sender=Post)
 def create_new_post(sender, instance, created, **kwargs):
-    if created:
+    if instance.confirmed_to_show and instance.waiting_to_confirm:
+        instance.waiting_to_confirm = False
+        instance.save()
         for user in instance.sender.follow.followers.all():
             Feed.objects.create(user=user, post=instance, sort_time=timezone.now())

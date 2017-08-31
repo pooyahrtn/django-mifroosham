@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.safestring import mark_safe
 from rest_framework.authtoken.models import Token
 
 
@@ -14,6 +15,12 @@ class Profile(models.Model):
     location = models.CharField(max_length=200, blank=True, null=True)
     show_phone_number = models.BooleanField(default=False)
     full_name = models.CharField(null=True, max_length=40)
+    score = models.FloatField(default=0, blank=True)
+
+    def image_tag(self):
+        return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.avatar_url)
+
+    image_tag.short_description = 'avatar'
 
     def __str__(self):
         return self.user.username

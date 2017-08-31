@@ -7,9 +7,11 @@ from django.utils import timezone
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    score = serializers.ReadOnlyField()
+
     class Meta:
         model = Profile
-        fields = ('avatar_url', 'bio', 'full_name')
+        fields = ('score', 'avatar_url', 'bio', 'full_name')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,7 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserWithoutProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', )
+        fields = ('username',)
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -34,18 +36,22 @@ class SignUpSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         phone_number = validated_data.get('phone_number')
-        user = User.objects.create_user(username=validated_data.get('username'), password=validated_data.get('password'))
-        PhoneNumber.objects.create(user=user, number=phone_number)
+        user = User.objects.create_user(username=validated_data.get('username'),
+                                        password=validated_data.get('password'))
+        phone, created = PhoneNumber.objects.get_or_create(user=user, number=phone_number)
+        if not created:
+            raise exceptions.CreateUserException(code=502, detail='this phone number exists')
         return user
 
 
 class MyProfileSerializer(serializers.ModelSerializer):
     money = serializers.ReadOnlyField()
     user = UserWithoutProfileSerializer(read_only=True)
+    score = serializers.ReadOnlyField()
 
     class Meta:
         model = Profile
-        fields = ('money', 'avatar_url' ,'user', 'full_name', 'show_phone_number', 'location', 'bio')
+        fields = ('money', 'score','avatar_url', 'user', 'full_name', 'show_phone_number', 'location', 'bio')
 
 
 class UpdateProfilePhotoSerializer(serializers.ModelSerializer):

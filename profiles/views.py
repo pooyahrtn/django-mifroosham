@@ -20,7 +20,7 @@ import datetime
 
 def change_follower_feed(follower, who_followed, is_followed):
     if is_followed:
-        for post in who_followed.posts.all():
+        for post in who_followed.posts.filter(confirmed_to_show=True):
             Feed.objects.create(user=follower, post=post, sort_time=post.sent_time)
     else:
         for post in who_followed.posts.all():
