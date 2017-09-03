@@ -40,17 +40,17 @@ class DiscountSerializer(serializers.ModelSerializer):
 
 
 class PostWithoutSenderSerializer(serializers.ModelSerializer):
-    discount = DiscountSerializer(allow_null=True)
-    auction = AuctionSerializer(allow_null=True)
+    discount = DiscountSerializer(allow_null=True, required=False)
+    auction = AuctionSerializer(allow_null=True, required=False)
     post_type = serializers.IntegerField(source='get_post_type', read_only=True)
-    image_url = serializers.CharField()
+    image_url = serializers.ImageField()
     n_likes = serializers.IntegerField(read_only=True)
     n_reposters = serializers.IntegerField(read_only=True)
     disabled = serializers.ReadOnlyField()
 
     class Meta:
         model = Post
-        exclude = ('sender', 'likes', 'reposters', 'id', 'waiting_to_confirm')
+        exclude = ('sender', 'likes', 'reposters', 'id', 'waiting_to_confirm', 'confirmed_to_show')
         depth = 1
 
 
@@ -60,6 +60,7 @@ class LikePostSerializer(serializers.ModelSerializer):
     title = serializers.CharField(read_only=True)
     n_likes = serializers.IntegerField(read_only=True)
     n_reposters = serializers.IntegerField(read_only=True)
+    uuid = serializers.UUIDField(read_only=True)
 
     class Meta:
         model = Post
@@ -92,6 +93,7 @@ class PostSerializer(PostWithoutSenderSerializer):
         discount_data = validated_data.get('discount')
         sender_type = validated_data.get('sender_type')
         validated_data.pop('sender_type', None)
+
         if sender_type == 2:
             if auction_data is None:
                 raise SendPostException(detail='auction data cant be null')
@@ -108,6 +110,9 @@ class PostSerializer(PostWithoutSenderSerializer):
             validated_data.pop('discount', None)
             validated_data.pop('price', None)
             return Post.objects.create(discount=discount, price=0, **validated_data)
+        else:
+            if validated_data.get('price') < 1000:
+                raise SendPostException(detail='low price')
         return Post.objects.create(**validated_data)
 
         # def update(self, instance, validated_data):
@@ -137,11 +142,20 @@ class PostSerializer(PostWithoutSenderSerializer):
 class FeedSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)
     reposter = UserSerializer(read_only=True)
+    you_liked = serializers.SerializerMethodField()
+    you_reposted = serializers.SerializerMethodField()
+    sort_time = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Feed
-        fields = ('post', 'reposter')
+        fields = ('post', 'reposter', 'you_liked', 'you_reposted', 'sort_time')
         depth = 1
+
+    def get_you_liked(self, obj):
+        return obj.post.likes.filter(username=self.context['request'].user.username).exists()
+
+    def get_you_reposted(self, obj):
+        return obj.post.reposters.filter(username=self.context['request'].user.username).exists()
 
 
 class PostDetailSerializer(PostSerializer):
@@ -149,7 +163,7 @@ class PostDetailSerializer(PostSerializer):
 
     class Meta:
         model = Post
-        exclude = ('likes', 'id')
+        exclude = ('likes', 'id', 'confirmed_to_show', 'waiting_to_confirm')
 
 
 class UserWithPostSerializer(serializers.ModelSerializer):

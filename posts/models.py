@@ -1,11 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import F
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils import timezone
 import uuid as uuid_lib
-
+import re
 from django.utils.safestring import mark_safe
 
 
@@ -49,6 +48,7 @@ class Post(models.Model):
     deliver_time = models.IntegerField(default=24)
     confirmed_to_show = models.BooleanField(default=False)
     waiting_to_confirm = models.BooleanField(default=True, editable=False)
+
 
     def __str__(self):
         return self.title
@@ -98,6 +98,11 @@ class Feed(models.Model):
 def create_new_post(sender, instance, created, **kwargs):
     if instance.confirmed_to_show and instance.waiting_to_confirm:
         instance.waiting_to_confirm = False
+        pattern = re.compile("#([^\s]+)")
+        m = pattern.findall(instance.description)
+        from tags.models import Tag
+        for tag in m:
+            t, created = Tag.objects.get_or_create(name=tag, post=instance)
         instance.save()
         for user in instance.sender.follow.followers.all():
             Feed.objects.create(user=user, post=instance, sort_time=timezone.now())

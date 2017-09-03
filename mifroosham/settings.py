@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'posts.apps.PostsConfig',
     'profiles.apps.ProfilesConfig',
+    'tags.apps.TagsConfig',
     'transactions.apps.TransactionsConfig',
     'reports.apps.ReportsConfig',
     'rest_framework.authtoken',

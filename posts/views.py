@@ -19,11 +19,15 @@ class FeedList(generics.ListAPIView):
     def get_queryset(self):
         return self.request.user.feed_set.filter(post__disabled=False)
 
+    # def get_serializer_context(self):
+    #     return
+
 
 class LikePost(generics.UpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = LikePostSerializer
     permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = 'uuid'
 
     @transaction.atomic
     def perform_update(self, serializer):
@@ -43,6 +47,7 @@ class Repost(generics.UpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = RepostPostSerializer
     permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = 'uuid'
 
     @transaction.atomic
     def perform_update(self, serializer):

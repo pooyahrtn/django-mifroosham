@@ -74,48 +74,6 @@ class BuyPost(APIView):
                                                             status=TransactionNotification.SELL)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        #
-        # @transaction.atomic
-        # def create(self, request, *args, **kwargs):
-        #     post = get_object_or_404(Post.objects.select_for_update(), uuid=self.kwargs['post_uuid'])
-        #     me = self.request.user
-        #     my_profile = get_object_or_404(Profile.objects.select_for_update(), user_id=me.pk)
-        #     if post.sender.username == me.username:
-        #         return Response(data='dude you cant do in jib too oon jib', status=status.HTTP_403_FORBIDDEN)
-        #     if post.disabled:
-        #         return Response(data='this post is bought or disabled', status=status.HTTP_403_FORBIDDEN)
-        #     if Transaction.objects.filter(post=post, buyer=self.request.user, status=Transaction.PENDING).exists():
-        #         return Response(data='you bough this shit', status=status.HTTP_302_FOUND)
-        #
-        #     serializer = self.get_serializer(data=request.data)
-        #     serializer.is_valid(raise_exception=True)
-        #     price = 0
-        #     # confirmed = False
-        #     # confirm_time = None
-        #     if post.get_post_type() == Post.NORMAL_ITEM:
-        #         price = post.price
-        #         if my_profile.money < price:
-        #             return Response(data='low money', status=status.HTTP_406_NOT_ACCEPTABLE)
-        #         else:
-        #             my_profile.money -= price
-        #             my_profile.save()
-        #     elif post.get_post_type() == Post.DISCOUNT_ITEM:
-        #         discount = get_object_or_404(Discount, pk=post.discount.pk)
-        #         price = calculate_discount_current_price(discount)
-        #         if my_profile.money < price:
-        #             return Response(data='low money', status=status.HTTP_406_NOT_ACCEPTABLE)
-        #         else:
-        #             my_profile.money -= price
-        #             my_profile.save()
-        #             # confirmed = True
-        #             # confirm_time = timezone.now()
-        #             post.disabled = post.disable_after_buy
-        #     post.save()
-        #     serializer.save(buyer=self.request.user, post=post, suspended_money=price,
-        #                     status=Transaction.PENDING)
-        #     headers = self.get_success_headers(serializer.data)
-        #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
 
 class CancelBuy(APIView):
     serializer_class = GetTransactionSerializer
@@ -259,43 +217,6 @@ class AuctionSuggestHigher(APIView):
         Transaction.objects.create(buyer=self.request.user, post=post, reposter=reposter)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-        #
-        # @transaction.atomic
-        # def perform_create(self, serializer):
-        #     buyer = self.request.user
-        #     buyer_profile = get_object_or_404(Profile.objects.select_for_update(), pk=buyer.pk)
-        #     post = get_object_or_404(Post.objects.select_for_update(), pk=self.kwargs['pk'])
-        #     trans = serializer.save()
-        #     auction = get_object_or_404(Auction.objects.select_for_update(), pk=post.auction_id)
-        #
-        #     if trans.suspended_money > buyer_profile.money:
-        #         raise MoneyException()
-        #
-        #     # people who attempted buy this post but they have lower suggest.(normally it should be one person)
-        #     this_post_buyers = Transaction.objects.filter(post=post, status=Transaction.PENDING).order_by('-suspended_money')
-        #
-        #     if this_post_buyers.count() > 0:
-        #         min_price = this_post_buyers[0].suspended_money + 1
-        #     else:
-        #         min_price = auction.base_money
-        #
-        #     if trans.suspended_money < min_price:
-        #         raise MoneyException()
-        #
-        #     trans.buyer = buyer
-        #     trans.post = post
-        #     auction.highest_suggest = trans.suspended_money
-        #     buyer_profile.money -= trans.suspended_money
-        #     for last_transaction in this_post_buyers:
-        #         his_suspended_money = last_transaction.suspended_money
-        #         last_transaction.status = Transaction.CANCELED
-        #         Profile.objects.filter(user_id=last_transaction.buyer.pk).update(money=F('money') + his_suspended_money)
-        #         last_transaction.save()
-        #     buyer_profile.save()
-        #     auction.save()
-        #     # trans.confirmed = True
-        #     # trans.confirm_time = timezone.now()
-        #     trans.save()
 
 
 class MyTransactions(generics.ListAPIView):
