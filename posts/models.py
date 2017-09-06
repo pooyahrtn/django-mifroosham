@@ -6,6 +6,7 @@ from django.utils import timezone
 import uuid as uuid_lib
 import re
 from django.utils.safestring import mark_safe
+from .utils import value_of_feed
 
 
 class Discount(models.Model):
@@ -35,7 +36,8 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     price = models.BigIntegerField(blank=True, null=True)
     is_charity = models.BooleanField(default=False)
-    image_url = models.ImageField()
+    #TODO: remove this null
+    image_url = models.ImageField(null=True)
     description = models.CharField(max_length=600, blank=True)
     likes = models.ManyToManyField(to=User, blank=True, related_name='likes')
     reposters = models.ManyToManyField(to=User, blank=True, related_name='reposts')
@@ -48,7 +50,6 @@ class Post(models.Model):
     deliver_time = models.IntegerField(default=24)
     confirmed_to_show = models.BooleanField(default=False)
     waiting_to_confirm = models.BooleanField(default=True, editable=False)
-
 
     def __str__(self):
         return self.title
@@ -80,6 +81,12 @@ class Suggest(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
 
+class FeedManager(models.Manager):
+    def read_feeds(self, feeds_uuids, user, viewing_version):
+        self.filter(uuid__in=feeds_uuids, user=user).update(read=True, not_read_sort_value=viewing_version,
+                                                            sort_time=timezone.now())
+
+
 class Feed(models.Model):
     uuid = models.UUIDField(
         db_index=True,
@@ -88,21 +95,19 @@ class Feed(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
     reposter = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True, related_name='repost_posts')
-    sort_time = models.DateTimeField()
+    sort_time = models.DateTimeField(auto_now_add=True, db_index=True)
+    not_read_sort_value = models.IntegerField(default=0, db_index=True)
+    read = models.BooleanField(default=False)
+    buyable = models.BooleanField(default=True)
+    objects = FeedManager()
+
+    def __str__(self):
+        return self.post.title
 
     class Meta:
-        ordering = ['-sort_time']
+        ordering = ['read', '-not_read_sort_value', 'sort_time']
 
-
-@receiver(post_save, sender=Post)
-def create_new_post(sender, instance, created, **kwargs):
-    if instance.confirmed_to_show and instance.waiting_to_confirm:
-        instance.waiting_to_confirm = False
-        pattern = re.compile("#([^\s]+)")
-        m = pattern.findall(instance.description)
-        from tags.models import Tag
-        for tag in m:
-            t, created = Tag.objects.get_or_create(name=tag, post=instance)
-        instance.save()
-        for user in instance.sender.follow.followers.all():
-            Feed.objects.create(user=user, post=instance, sort_time=timezone.now())
+#
+# @receiver(post_save, sender=Post)
+# def create_new_post(sender, instance, created, **kwargs):
+#

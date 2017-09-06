@@ -1,6 +1,6 @@
 import random
 
-from django.db.models import Q
+from django.db.models import Q, F
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,7 +9,7 @@ from posts.models import Feed
 from .models import User, Profile, PhoneNumberConfirmation
 from .serializers import *
 from posts.serializers import UserWithPostSerializer
-from rest_framework import generics, parsers, renderers
+from rest_framework import generics, parsers, renderers, status
 from django.db import transaction
 from .tasks import send_sms
 from .exceptions import *
@@ -21,7 +21,7 @@ import datetime
 def change_follower_feed(follower, who_followed, is_followed):
     if is_followed:
         for post in who_followed.posts.filter(confirmed_to_show=True):
-            Feed.objects.create(user=follower, post=post, sort_time=post.sent_time)
+            Feed.objects.create(user=follower, post=post, sort_time=post.sent_time, read=True)
     else:
         for post in who_followed.posts.all():
             Feed.objects.filter(Q(user=follower), Q(post=post) | Q(reposter=who_followed)).delete()
@@ -142,3 +142,11 @@ class Login(APIView):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key})
+
+
+class IncreaseViewingApp(APIView):
+    def post(self, request, *args, **kwargs):
+        profile = Profile.objects.get(user=self.request.user)
+        profile.count_visiting_app = F('count_visiting_app') + 1
+        profile.save()
+        return Response(data=profile.count_visiting_app, status=status.HTTP_200_OK)

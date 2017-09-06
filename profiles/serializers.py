@@ -8,10 +8,11 @@ from django.utils import timezone
 
 class ProfileSerializer(serializers.ModelSerializer):
     score = serializers.ReadOnlyField()
+    count_of_rates = serializers.ReadOnlyField()
 
     class Meta:
         model = Profile
-        fields = ('score', 'avatar_url', 'bio', 'full_name')
+        fields = ('score', 'avatar_url', 'bio', 'full_name', 'count_of_rates')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -48,10 +49,11 @@ class MyProfileSerializer(serializers.ModelSerializer):
     money = serializers.ReadOnlyField()
     user = UserWithoutProfileSerializer(read_only=True)
     score = serializers.ReadOnlyField()
+    count_of_rates = serializers.ReadOnlyField()
 
     class Meta:
         model = Profile
-        fields = ('money', 'score','avatar_url', 'user', 'full_name', 'show_phone_number', 'location', 'bio')
+        fields = ('money', 'score', 'count_of_rates', 'avatar_url', 'user', 'full_name', 'show_phone_number', 'location', 'bio')
 
 
 class UpdateProfilePhotoSerializer(serializers.ModelSerializer):

@@ -141,7 +141,8 @@ class DeliverItem(APIView):
         seller = trans.post.sender
         reposter = trans.reposter
         if reposter:
-            Profile.objects.filter(user_id=reposter.pk).update(money=F('money') + trans.suspended_money * 0.05)
+            Profile.objects.filter(user_id=reposter.pk).update(money=F('money') + trans.suspended_money * 0.05,
+                                                               total_successful_reposts=F('total_successful_reposts') + 1)
             Profile.objects.filter(user__username='pooya').update(money=F('money') + trans.suspended_money * 0.05)
         else:
             Profile.objects.filter(user__username='pooya').update(money=F('money') + trans.suspended_money * 0.1)

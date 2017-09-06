@@ -43,7 +43,8 @@ class PostWithoutSenderSerializer(serializers.ModelSerializer):
     discount = DiscountSerializer(allow_null=True, required=False)
     auction = AuctionSerializer(allow_null=True, required=False)
     post_type = serializers.IntegerField(source='get_post_type', read_only=True)
-    image_url = serializers.ImageField()
+    #todo: remove allow null
+    image_url = serializers.ImageField(allow_null=True)
     n_likes = serializers.IntegerField(read_only=True)
     n_reposters = serializers.IntegerField(read_only=True)
     disabled = serializers.ReadOnlyField()
@@ -97,7 +98,7 @@ class PostSerializer(PostWithoutSenderSerializer):
         if sender_type == 2:
             if auction_data is None:
                 raise SendPostException(detail='auction data cant be null')
-            validate_dicount_time(discount_data.get('end_time'))
+            validate_dicount_time(auction_data.get('end_time'))
             auction = Auction.objects.create(**auction_data)
             validated_data.pop('auction', None)
             validated_data.pop('price', None)
@@ -115,40 +116,18 @@ class PostSerializer(PostWithoutSenderSerializer):
                 raise SendPostException(detail='low price')
         return Post.objects.create(**validated_data)
 
-        # def update(self, instance, validated_data):
-        #     sender_type = validated_data.get('sender_type')
-        #     if sender_type != instance.post_type:
-        #         return SendPostException('you can not change post type')
-        #
-        #     auction_data = validated_data.get('auction')
-        #     discount_data = validated_data.get('discount')
-        #
-        #     if sender_type == 2:
-        #         if auction_data is None:
-        #             raise SendPostException(detail='auction data cant be null')
-        #         auction = instance.auction
-        #         Auction.objects.filter(pk=auction.pk).update(**auction_data)
-        #         validated_data.pop('auction', None)
-        #         return Post.objects.filter(auction=auction, **validated_data)
-        #     elif sender_type == 1:
-        #         if discount_data is None:
-        #             raise SendPostException(detail='discount data cant be null')
-        #         validate_dicount_time(discount_data.get('end_time'))
-        #         discount = Discount.objects.create(**discount_data)
-        #         validated_data.pop('discount', None)
-        #         return Post.objects.create(discount=discount, **validated_data)
-
 
 class FeedSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)
     reposter = UserSerializer(read_only=True)
     you_liked = serializers.SerializerMethodField()
     you_reposted = serializers.SerializerMethodField()
-    sort_time = serializers.DateTimeField(read_only=True)
+    read = serializers.BooleanField()
+    uuid = serializers.ReadOnlyField()
 
     class Meta:
         model = Feed
-        fields = ('post', 'reposter', 'you_liked', 'you_reposted', 'sort_time')
+        fields = ('post', 'reposter', 'you_liked', 'you_reposted', 'uuid', 'read', 'buyable')
         depth = 1
 
     def get_you_liked(self, obj):
@@ -156,6 +135,12 @@ class FeedSerializer(serializers.ModelSerializer):
 
     def get_you_reposted(self, obj):
         return obj.post.reposters.filter(username=self.context['request'].user.username).exists()
+
+
+
+class FeedsUUIDSerializer(serializers.Serializer):
+    uuids = serializers.ListField(child=serializers.UUIDField())
+    visiting_version = serializers.IntegerField()
 
 
 class PostDetailSerializer(PostSerializer):

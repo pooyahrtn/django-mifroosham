@@ -10,5 +10,6 @@ urlpatterns = [
     url(r'^comments/(?P<pk>[0-9]+)$', views.Comments.as_view()),
     url(r'^send/$', views.SendPost.as_view()),
     url(r'^suggest/', views.SuggestPost.as_view()),
+    url(r'^read_feeds/', views.ReadFeeds.as_view()),
     url(r'^(?P<pk>[0-9]+)$', views.PostDetail.as_view()),
 ]
