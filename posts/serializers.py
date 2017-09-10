@@ -48,6 +48,7 @@ class PostWithoutSenderSerializer(serializers.ModelSerializer):
     n_likes = serializers.IntegerField(read_only=True)
     n_reposters = serializers.IntegerField(read_only=True)
     disabled = serializers.ReadOnlyField()
+    remaining_qeroons = serializers.ReadOnlyField()
 
     class Meta:
         model = Post
@@ -86,15 +87,18 @@ class PostSerializer(PostWithoutSenderSerializer):
 
     class Meta:
         model = Post
-        exclude = ('likes', 'reposters', 'id', 'waiting_to_confirm', 'confirmed_to_show')
+        fields = ('sender', 'title', 'price', 'is_charity', 'image_url', 'description',
+                  'discount', 'auction', 'disable_after_buy', 'deliver_time', 'ads_included',
+                  'sender_type', 'remaining_qeroons', 'uuid', 'sent_time', 'total_invested_qeroons')
         depth = 1
 
     def create(self, validated_data):
         auction_data = validated_data.get('auction')
         discount_data = validated_data.get('discount')
-        sender_type = validated_data.get('sender_type')
+        sender_type = validated_data.pop('sender_type')
         validated_data.pop('sender_type', None)
-
+        ads_included = validated_data.get('ads_included')
+        remaining_qeroons = 0
         if sender_type == 2:
             if auction_data is None:
                 raise SendPostException(detail='auction data cant be null')
@@ -102,7 +106,9 @@ class PostSerializer(PostWithoutSenderSerializer):
             auction = Auction.objects.create(**auction_data)
             validated_data.pop('auction', None)
             validated_data.pop('price', None)
-            return Post.objects.create(auction=auction, price=0, **validated_data)
+            if ads_included:
+                remaining_qeroons = int(auction_data.get('base_money') * 0.001)
+            return Post.objects.create(auction=auction, price=0, remaining_qeroons=remaining_qeroons ,**validated_data)
         elif sender_type == 1:
             if discount_data is None:
                 raise SendPostException(detail='discount data cant be null')
@@ -110,11 +116,15 @@ class PostSerializer(PostWithoutSenderSerializer):
             discount = Discount.objects.create(**discount_data)
             validated_data.pop('discount', None)
             validated_data.pop('price', None)
-            return Post.objects.create(discount=discount, price=0, **validated_data)
+            if ads_included:
+                remaining_qeroons = int(discount_data.get('start_price') * 0.001)
+            return Post.objects.create(discount=discount, price=0, remaining_qeroons=remaining_qeroons, **validated_data)
         else:
             if validated_data.get('price') < 1000:
                 raise SendPostException(detail='low price')
-        return Post.objects.create(**validated_data)
+            if ads_included:
+                remaining_qeroons = int(validated_data.get('price') * 0.001)
+        return Post.objects.create(remaining_qeroons=remaining_qeroons, **validated_data)
 
 
 class FeedSerializer(serializers.ModelSerializer):

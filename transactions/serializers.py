@@ -25,6 +25,7 @@ class BuyTransactionSerializer(serializers.Serializer):
 
 class GetTransactionSerializer(serializers.Serializer):
     transaction_uuid = serializers.UUIDField()
+    confirm_code = serializers.IntegerField()
 
     def validate(self, attrs):
         transaction_uuid = attrs.get('transaction_uuid')
@@ -33,20 +34,25 @@ class GetTransactionSerializer(serializers.Serializer):
         return attrs
 
 
+class InvestOnPostSerializer(serializers.Serializer):
+    post_uuid = serializers.UUIDField(label="post_uuid")
+    value = serializers.IntegerField()
+
+
 class TransactionSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)
     status = serializers.ReadOnlyField()
     buyer = UserSerializer(read_only=True)
     suspended_money = serializers.ReadOnlyField()
-    confirmed = serializers.BooleanField(read_only=True)
-    confirm_time = serializers.ReadOnlyField()
+    # confirmed = serializers.BooleanField(read_only=True)
+    # confirm_time = serializers.ReadOnlyField()
     deliver_time = serializers.ReadOnlyField()
     cancel_time = serializers.ReadOnlyField()
     reposter = UserSerializer(read_only=True)
 
     class Meta:
         model = Transaction
-        exclude = ('id',)
+        fields= ('post', 'status', 'buyer', 'suspended_money', 'deliver_time', 'cancel_time', 'reposter', 'uuid')
 
 
 class AuctionSuggestSerializer(BuyTransactionSerializer):

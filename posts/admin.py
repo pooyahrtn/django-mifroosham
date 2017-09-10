@@ -50,8 +50,8 @@ class PostAdmin(admin.ModelAdmin):
             obj.save()
             value = value_of_feed(obj.sender.profile.score, obj.sender.profile.count_of_rates, 1)
             for user in obj.sender.follow.followers.all():
-                Feed.objects.create(user=user, post=obj, not_read_sort_value=value)
-            Feed.objects.create(user=obj.sender, post=obj, not_read_sort_value=2147483647, buyable=False)
+                Feed.objects.create(user=user, post=obj, sort_value=value)
+            Feed.objects.create(user=obj.sender, post=obj, sort_value=2147483647, buyable=False)
         super(PostAdmin, self).save_model(request, obj, form, change)
 
 

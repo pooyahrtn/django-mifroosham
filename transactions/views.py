@@ -2,12 +2,10 @@ from django.db.models import F
 from django.db.models import Q
 from rest_framework.views import APIView
 from profiles.models import Profile
-from .models import Transaction
 from rest_framework import generics
 from django.db import transaction
 from posts.models import Post, Auction, Discount
-from .serializers import TransactionSerializer, BuyTransactionSerializer, \
-    GetTransactionSerializer
+from .serializers import *
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,6 +15,9 @@ from .exceptions import *
 from .permissions import *
 import datetime
 from notifications.models import TransactionNotification
+from .models import QeroonTransaction
+import random
+
 
 
 def calculate_discount_current_price(discount):
@@ -42,7 +43,7 @@ class BuyPost(APIView):
         my_profile = get_object_or_404(Profile.objects.select_for_update(), user_id=me.pk)
         if post.sender.username == me.username:
             return Response(data='dude you cant do in jib too oon jib', status=status.HTTP_403_FORBIDDEN)
-        if post.disabled:
+        if post.disabled or not post.confirmed_to_show:
             return Response(data='this post is bought or disabled', status=status.HTTP_403_FORBIDDEN)
         if Transaction.objects.filter(post=post, buyer=self.request.user, status=Transaction.PENDING).exists():
             return Response(data='you bough this shit', status=status.HTTP_302_FOUND)
@@ -67,12 +68,46 @@ class BuyPost(APIView):
         post.disabled = post.disable_after_buy
         post.save()
         trans = Transaction.objects.create(buyer=self.request.user, post=post, suspended_money=price,
-                                           status=Transaction.PENDING, reposter=reposter)
+                                           status=Transaction.PENDING, reposter=reposter,
+                                           confirm_code=random.randint(100000, 999999))
         TransactionNotification.objects.create_notification(transaction=trans, user=me,
                                                             status=TransactionNotification.BUY)
         TransactionNotification.objects.create_notification(transaction=trans, user=post.sender,
                                                             status=TransactionNotification.SELL)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        data= serializer.data
+        data['confirm_code'] = trans.confirm_code
+        return Response(data, status=status.HTTP_201_CREATED)
+
+
+class InvestOnPost(APIView):
+    serializer_class = InvestOnPostSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        post_uuid = serializer.validated_data['post_uuid']
+        value = serializer.validated_data['value']
+        post = get_object_or_404(Post.objects.select_for_update(), uuid=post_uuid)
+        if post.disabled or not post.confirmed_to_show:
+            return Response(data='this post is bought or disabled', status=status.HTTP_403_FORBIDDEN)
+
+        user_qeroons = self.request.user.profile.qeroon
+        if user_qeroons < value:
+            return Response('not enough qeroons to perform', status=status.HTTP_400_BAD_REQUEST)
+        if post.remaining_qeroons < value:
+            return Response('post qeroons are less than requested value', status.HTTP_410_GONE)
+        if value < 1:
+            return Response('value should more than 1', status=status.HTTP_400_BAD_REQUEST)
+        self.request.user.profile.qeroon = F('qeroon') - value
+        self.request.user.profile.save()
+        post.remaining_qeroons = F('remaining_qeroons') - value
+        post.total_invested_qeroons = F('total_invested_qeroons') + value
+        post.save()
+        QeroonTransaction.objects.create(suspended_qeroon=value, status=QeroonTransaction.REQUESTED, post=post,
+                                         user=self.request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CancelBuy(APIView):
@@ -98,58 +133,35 @@ class CancelBuy(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 
-# class ConfirmSell(generics.UpdateAPIView):
-#     queryset = Transaction.objects.all()
-#     serializer_class = TransactionSerializer
-#     permission_classes = (permissions.IsAuthenticated, IsOwnerOfTransactionsPost)
-#     lookup_field = 'uuid'
-#
-#     @transaction.atomic
-#     def perform_update(self, serializer):
-#         trans = self.get_object()
-#         if trans.post.sender.pk != self.request.user.pk:
-#             raise YouAreNotAuthorised()
-#         if trans.confirmed:
-#             raise AlreadyConfirmed()
-#         if trans.status == Transaction.CANCELED or trans.status == Transaction.DELIVERED:
-#             raise AlreadyCanceled()
-#         if trans.post.disable_after_buy:
-#             trans.post.disabled = True
-#             trans.post.save()
-#             for other_user_transaction in Transaction.objects.filter(Q(post=trans.post), Q(status=Transaction.PENDING),
-#                                                                      ~Q(pk=trans.pk)):
-#                 Profile.objects.filter(user_id=other_user_transaction.buyer.pk). \
-#                     update(money=F('money') + other_user_transaction.suspended_money)
-#         serializer.save(confirmed=True, confirm_time=timezone.now())
-#
-
 class DeliverItem(APIView):
     serializer_class = GetTransactionSerializer
-    permission_classes = (permissions.IsAuthenticated, IsBuyerOfTransaction)
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOfTransactionsPost)
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         trans = serializer.validated_data['transaction']
-        if trans.buyer.pk != self.request.user.pk:
-            raise YouAreNotAuthorised()
         if trans.status == Transaction.DELIVERED:
             raise AlreadyDelivered()
         if trans.status == Transaction.CANCELED:
             raise AlreadyCanceled()
+        if serializer.validated_data['confirm_code'] != trans.confirm_code:
+            raise WrongConfirmCode()
         seller = trans.post.sender
         reposter = trans.reposter
         if reposter:
-            Profile.objects.filter(user_id=reposter.pk).update(money=F('money') + trans.suspended_money * 0.05,
-                                                               total_successful_reposts=F('total_successful_reposts') + 1)
-            Profile.objects.filter(user__username='pooya').update(money=F('money') + trans.suspended_money * 0.05)
+            Profile.objects.filter(user_id=reposter.pk).update(total_successful_reposts=
+                                                               F('total_successful_reposts') + 1)
+        if trans.post.ads_included:
+            Profile.objects.filter(user_id=seller.pk).update(money=F('money') + trans.suspended_money * 0.9)
+            Profile.objects.filter(user=trans.buyer).update(qeroon=F('qeroon') + trans.post.total_invested_qeroons)
         else:
-            Profile.objects.filter(user__username='pooya').update(money=F('money') + trans.suspended_money * 0.1)
-        Profile.objects.filter(user_id=seller.pk).update(money=F('money') + trans.suspended_money * 0.9)
+            Profile.objects.filter(user_id=seller.pk).update(money=F('money') + trans.suspended_money)
         trans.status = Transaction.DELIVERED
         trans.deliver_time = timezone.now()
         trans.save()
+        QeroonTransaction.objects.give_investors_money(post=trans.post)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -217,7 +229,6 @@ class AuctionSuggestHigher(APIView):
         auction.save()
         Transaction.objects.create(buyer=self.request.user, post=post, reposter=reposter)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 
 class MyTransactions(generics.ListAPIView):

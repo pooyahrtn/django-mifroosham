@@ -6,21 +6,21 @@ from django.utils import timezone
 import uuid as uuid_lib
 import re
 from django.utils.safestring import mark_safe
-from .utils import value_of_feed
+from django.core.validators import MinValueValidator
 
 
 class Discount(models.Model):
     # post = models.OneToOneField(Post,on_delete=models.CASCADE)
-    start_price = models.BigIntegerField()
-    real_price = models.BigIntegerField()
+    start_price = models.BigIntegerField(blank=True)
+    real_price = models.BigIntegerField(blank=True)
     start_time = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField()
+    end_time = models.DateTimeField(blank=True)
 
 
 class Auction(models.Model):
     highest_suggest = models.BigIntegerField(blank=True, null=True)
     base_money = models.BigIntegerField(default=0)
-    end_time = models.DateTimeField()
+    end_time = models.DateTimeField(blank=True)
 
 
 class Post(models.Model):
@@ -50,6 +50,9 @@ class Post(models.Model):
     deliver_time = models.IntegerField(default=24)
     confirmed_to_show = models.BooleanField(default=False)
     waiting_to_confirm = models.BooleanField(default=True, editable=False)
+    remaining_qeroons = models.PositiveIntegerField(default=0)
+    total_invested_qeroons = models.PositiveIntegerField(default=0)
+    ads_included = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -83,8 +86,7 @@ class Suggest(models.Model):
 
 class FeedManager(models.Manager):
     def read_feeds(self, feeds_uuids, user, viewing_version):
-        self.filter(uuid__in=feeds_uuids, user=user).update(read=True, not_read_sort_value=viewing_version,
-                                                            sort_time=timezone.now())
+        self.filter(uuid__in=feeds_uuids, user=user, read=False).update(read=True, sort_version=viewing_version)
 
 
 class Feed(models.Model):
@@ -95,8 +97,8 @@ class Feed(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
     reposter = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True, related_name='repost_posts')
-    sort_time = models.DateTimeField(auto_now_add=True, db_index=True)
-    not_read_sort_value = models.IntegerField(default=0, db_index=True)
+    sort_version = models.IntegerField(default=0, blank=True, db_index=True)
+    sort_value = models.IntegerField(default=0, db_index=True)
     read = models.BooleanField(default=False)
     buyable = models.BooleanField(default=True)
     objects = FeedManager()
@@ -105,7 +107,7 @@ class Feed(models.Model):
         return self.post.title
 
     class Meta:
-        ordering = ['read', '-not_read_sort_value', 'sort_time']
+        ordering = ['read', '-sort_version', '-sort_value', 'pk']
 
 #
 # @receiver(post_save, sender=Post)

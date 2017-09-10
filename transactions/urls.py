@@ -6,6 +6,7 @@ from .views import *
 urlpatterns = [
     url(r'^cancel$', CancelBuy.as_view()),
     url(r'^buy$', BuyPost.as_view()),
+    url(r'^invest$', InvestOnPost.as_view()),
     # url(r'^confirm_sell/(?P<uuid>[0-9A-Fa-f-]+)$', ConfirmSell.as_view()),
     url(r'^deliver$', DeliverItem.as_view()),
     url(r'^auction_suggest_higher', AuctionSuggestHigher.as_view()),
