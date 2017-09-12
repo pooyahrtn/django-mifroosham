@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from posts.serializers import PostSerializer
 from .models import Transaction
-from profiles.serializers import UserSerializer
+from profiles.serializers import UserSerializer, ReviewSerializer
 from posts.models import Feed, Post
 from django.contrib.auth.models import User
 
@@ -25,7 +25,6 @@ class BuyTransactionSerializer(serializers.Serializer):
 
 class GetTransactionSerializer(serializers.Serializer):
     transaction_uuid = serializers.UUIDField()
-    confirm_code = serializers.IntegerField()
 
     def validate(self, attrs):
         transaction_uuid = attrs.get('transaction_uuid')
@@ -34,9 +33,22 @@ class GetTransactionSerializer(serializers.Serializer):
         return attrs
 
 
+class DeliverTransactionSerializer(GetTransactionSerializer):
+    confirm_code = serializers.IntegerField()
+
+
+class WriteReviewSerializer(GetTransactionSerializer):
+    rate = serializers.IntegerField(min_value=1, max_value=5)
+    comment = serializers.CharField(max_length=400, allow_null=True, allow_blank=True)
+
+
+
 class InvestOnPostSerializer(serializers.Serializer):
     post_uuid = serializers.UUIDField(label="post_uuid")
     value = serializers.IntegerField()
+
+transaction_base_fields = ('post', 'status', 'buyer', 'suspended_money', 'deliver_time', 'cancel_time',
+                           'reposter', 'uuid', 'review')
 
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -44,15 +56,22 @@ class TransactionSerializer(serializers.ModelSerializer):
     status = serializers.ReadOnlyField()
     buyer = UserSerializer(read_only=True)
     suspended_money = serializers.ReadOnlyField()
-    # confirmed = serializers.BooleanField(read_only=True)
-    # confirm_time = serializers.ReadOnlyField()
     deliver_time = serializers.ReadOnlyField()
     cancel_time = serializers.ReadOnlyField()
     reposter = UserSerializer(read_only=True)
+    review = ReviewSerializer(read_only=True)
 
     class Meta:
         model = Transaction
-        fields= ('post', 'status', 'buyer', 'suspended_money', 'deliver_time', 'cancel_time', 'reposter', 'uuid')
+        fields= transaction_base_fields
+
+
+class BoughtTransactionsSerializer(TransactionSerializer):
+    confirm_code = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Transaction
+        fields = transaction_base_fields + ('confirm_code',)
 
 
 class AuctionSuggestSerializer(BuyTransactionSerializer):

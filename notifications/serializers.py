@@ -20,6 +20,7 @@ class UserTokenSerializer(serializers.ModelSerializer):
 
 class TransactionNotificationSerializer(serializers.ModelSerializer):
     transaction = TransactionSerializer(read_only=True)
+
     class Meta:
         model = TransactionNotification
         exclude = ('id','user')

@@ -37,7 +37,7 @@ class Post(models.Model):
     price = models.BigIntegerField(blank=True, null=True)
     is_charity = models.BooleanField(default=False)
     #TODO: remove this null
-    image_url = models.ImageField(null=True)
+    image_url = models.ImageField(null=True, blank=True)
     description = models.CharField(max_length=600, blank=True)
     likes = models.ManyToManyField(to=User, blank=True, related_name='likes')
     reposters = models.ManyToManyField(to=User, blank=True, related_name='reposts')

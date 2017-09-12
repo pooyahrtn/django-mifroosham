@@ -1,5 +1,7 @@
+from __future__ import division
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import F
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.safestring import mark_safe
@@ -52,10 +54,33 @@ class PhoneNumber(models.Model):
 class PhoneNumberConfirmation(models.Model):
     user = models.OneToOneField(to=User, related_name='phone_confirmation')
     confirm_code = models.IntegerField()
-    last_request_time = models.DateTimeField(null=True, blank=True ,auto_now_add=True)
+    last_request_time = models.DateTimeField(null=True, blank=True, auto_now_add=True)
 
     def __str__(self):
         return self.user.username
+
+
+class ReviewManager(models.Manager):
+    def write_review(self, **kwargs):
+        if kwargs['rate'] > 5 or kwargs['rate'] < 0:
+            return
+        Profile.objects.filter(user=kwargs['for_user']) \
+            .update(score=(F('score') * F('count_of_rates') + kwargs['rate']) / (F('count_of_rates') + 1),
+                    count_of_rates=F('count_of_rates') + 1
+                    )
+        return self.create(**kwargs)
+
+
+class Review(models.Model):
+    for_user = models.ForeignKey(User, related_name='reviews')
+    reviewer = models.ForeignKey(User, related_name='wrote_reviews')
+    rate = models.SmallIntegerField(default=5)
+    comment = models.CharField(max_length=400, null=True, blank=True)
+
+    objects = ReviewManager()
+
+    def __str__(self):
+        return self.for_user.username
 
 
 @receiver(post_save, sender=User)

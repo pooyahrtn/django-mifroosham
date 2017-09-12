@@ -1,19 +1,30 @@
 from django.db import models
 from django.db.models import F
-
 from posts.models import Post, Feed
 from django.contrib.auth.models import User
 import uuid as uuid_lib
+from profiles.models import Review
 
 
 class Transaction(models.Model):
     PENDING = 'pe'
     DELIVERED = 'de'
     CANCELED = 'ca'
+
+    NOT_RATEABLE = 'nr'
+    CAN_RATE = 'cr'
+    RATED = 'ra'
+
     STATUS_CHOICES = (
         (PENDING, 'pending'),
         (DELIVERED, 'delivered'),
         (CANCELED, 'canceled')
+    )
+
+    RATE_STATUS_CHOICES = (
+        (NOT_RATEABLE, 'not rateable'),
+        (CAN_RATE, 'can rate'),
+        (RATED, 'rated')
     )
     uuid = models.UUIDField(
         db_index=True,
@@ -27,15 +38,21 @@ class Transaction(models.Model):
         choices=STATUS_CHOICES,
         default=PENDING
     )
-    # confirmed = models.BooleanField(default=False)
-
     suspended_money = models.BigIntegerField()
     time = models.DateTimeField(auto_now_add=True)
-    # confirm_time = models.DateTimeField(null=True)
     deliver_time = models.DateTimeField(null=True)
     cancel_time = models.DateTimeField(null=True)
     reposter = models.ForeignKey(to=User, null=True, blank=True, related_name='reposted_transaction')
     confirm_code = models.IntegerField(default=0)
+    rate_status = models.CharField(
+        max_length=2,
+        choices=RATE_STATUS_CHOICES,
+        default=NOT_RATEABLE
+    )
+    review = models.OneToOneField(Review, blank=True, null=True, related_name='transaction')
+
+    class Meta:
+        ordering = ['pk']
 
     def __str__(self):
         return self.post.title + ' buyer: ' + self.buyer.username

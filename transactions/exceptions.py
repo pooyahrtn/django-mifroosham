@@ -46,3 +46,8 @@ class WrongConfirmCode(APIException):
     status_code = 520
     default_code = 'wrong_confirmation_code'
     default_detail = 'wrong confirmation code'
+
+class NotAuthorized(APIException):
+    status_code = 521
+    default_detail = 'not authorized'
+    default_code = 'not_authorized'

@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from . import exceptions
-from .models import Profile, PhoneNumber, PhoneNumberConfirmation
+from .models import Profile, PhoneNumber, PhoneNumberConfirmation, Review
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -137,3 +137,11 @@ class AuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    reviewer = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Review
+        fields = ('rate', 'comment', 'reviewer')
