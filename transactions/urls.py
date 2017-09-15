@@ -13,5 +13,7 @@ urlpatterns = [
     url(r'^auction_suggest_higher', AuctionSuggestHigher.as_view()),
     url(r'^cancel_sell$', CancelSell.as_view()),
     url(r'^bought$', BoughtTransactions.as_view()),
-    url(r'^sold', SoldTransactions.as_view())
+    url(r'^sold', SoldTransactions.as_view()),
+    url(r'^invests', MyInvests.as_view()),
+    url(r'^return_invest', ReturnInvest.as_view())
 ]

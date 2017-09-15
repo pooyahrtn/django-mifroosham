@@ -4,6 +4,7 @@ from posts.models import Post, Feed
 from django.contrib.auth.models import User
 import uuid as uuid_lib
 from profiles.models import Review
+from datetime import datetime
 
 
 class Transaction(models.Model):
@@ -64,6 +65,7 @@ class QeroonTransactionManager(models.Manager):
         for transaction in self.filter(post=post, status='re').all():
             transaction.user.profile.money = F('money') + transaction.suspended_qeroon * 100
             transaction.status = QeroonTransaction.GOT
+            transaction.got_time = datetime.now()
             transaction.save()
             transaction.user.profile.save()
 
@@ -95,3 +97,6 @@ class QeroonTransaction(models.Model):
 
     def __str__(self):
         return self.user.username + ' ' + self.post.title
+
+    class Meta:
+        ordering = ['-pk',]

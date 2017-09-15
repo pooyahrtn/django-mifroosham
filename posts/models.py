@@ -36,7 +36,7 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     price = models.BigIntegerField(blank=True, null=True)
     is_charity = models.BooleanField(default=False)
-    #TODO: remove this null
+    # TODO:remove this null
     image_url = models.ImageField(null=True, blank=True)
     description = models.CharField(max_length=600, blank=True)
     likes = models.ManyToManyField(to=User, blank=True, related_name='likes')
@@ -47,7 +47,7 @@ class Post(models.Model):
     auction = models.OneToOneField(Auction, on_delete=models.CASCADE, blank=True, null=True)
     disable_after_buy = models.BooleanField(default=True)
     disabled = models.BooleanField(default=False)
-    deliver_time = models.IntegerField(default=24)
+    deliver_time = models.IntegerField(default=2)
     confirmed_to_show = models.BooleanField(default=False)
     waiting_to_confirm = models.BooleanField(default=True, editable=False)
     remaining_qeroons = models.PositiveIntegerField(default=0)
@@ -109,7 +109,7 @@ class Feed(models.Model):
     class Meta:
         ordering = ['read', '-sort_version', '-sort_value', 'pk']
 
-#
-# @receiver(post_save, sender=Post)
-# def create_new_post(sender, instance, created, **kwargs):
-#
+        #
+        # @receiver(post_save, sender=Post)
+        # def create_new_post(sender, instance, created, **kwargs):
+        #

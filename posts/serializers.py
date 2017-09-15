@@ -7,11 +7,11 @@ from django.utils import timezone
 from .exceptions import *
 
 
-def validate_dicount_time(end_time):
-    less = int(time.mktime(timezone.now().timetuple()))
-    greater = int(time.mktime(end_time.timetuple()))
-    if less > greater:
-        raise serializers.ValidationError('end_time is greater than now')
+# def validate_dicount_time(end_time):
+#     less = int(time.mktime(timezone.now().timetuple()))
+#     greater = int(time.mktime(end_time.timetuple()))
+#     if less > greater:
+#         raise serializers.ValidationError('end_time is greater than now')
 
 
 class AuctionSerializer(serializers.ModelSerializer):
@@ -30,20 +30,20 @@ class DiscountSerializer(serializers.ModelSerializer):
         model = Discount
         fields = ('start_price', 'real_price', 'start_time', 'end_time')
 
-    def create(self, validated_data):
-        validate_dicount_time(validated_data.get('end_time'))
-        super(DiscountSerializer, self).create(validated_data)
-
-    def update(self, instance, validated_data):
-        validate_dicount_time(validated_data.get('end_time'))
-        super(DiscountSerializer, self).update(instance, validated_data)
+    # def create(self, validated_data):
+    #      # validate_dicount_time(validated_data.get('end_time'))
+    #     # super(DiscountSerializer, self).create(validated_data)
+    #
+    # def update(self, instance, validated_data):
+    #     # validate_dicount_time(validated_data.get('end_time'))
+    #     # super(DiscountSerializer, self).update(instance, validated_data)
 
 
 class PostWithoutSenderSerializer(serializers.ModelSerializer):
     discount = DiscountSerializer(allow_null=True, required=False)
     auction = AuctionSerializer(allow_null=True, required=False)
     post_type = serializers.IntegerField(source='get_post_type', read_only=True)
-    #todo: remove allow null
+    # todo: remove allow null
     image_url = serializers.ImageField(allow_null=True)
     n_likes = serializers.IntegerField(read_only=True)
     n_reposters = serializers.IntegerField(read_only=True)
@@ -84,41 +84,70 @@ class RepostPostSerializer(serializers.ModelSerializer):
 class PostSerializer(PostWithoutSenderSerializer):
     sender = UserSerializer(read_only=True)
     sender_type = serializers.IntegerField(write_only=True)
+    post_type = serializers.IntegerField(source='get_post_type', read_only=True)
 
     class Meta:
         model = Post
         fields = ('sender', 'title', 'price', 'is_charity', 'image_url', 'description',
                   'discount', 'auction', 'disable_after_buy', 'deliver_time', 'ads_included',
-                  'sender_type', 'remaining_qeroons', 'uuid', 'sent_time', 'total_invested_qeroons')
+                  'sender_type', 'remaining_qeroons', 'uuid', 'sent_time', 'total_invested_qeroons', 'n_likes',
+                  'n_reposters', 'post_type')
         depth = 1
 
+
+class SendPostSerializer(serializers.ModelSerializer):
+    discount_start_price = serializers.IntegerField(write_only=True, allow_null=True, required=False)
+    discount_end_price = serializers.IntegerField(write_only=True, allow_null=True, required=False)
+    end_time = serializers.IntegerField(write_only=True, allow_null=True, required=False)
+    auction_base_price = serializers.IntegerField(write_only=True, allow_null=True, required=False)
+    sender_type = serializers.IntegerField(write_only=True)
+    remaining_qeroons = serializers.ReadOnlyField()
+    total_invested_qeroons = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Post
+        fields = ('title', 'price', 'is_charity', 'image_url', 'description',
+                  'disable_after_buy', 'deliver_time', 'ads_included',
+                  'sender_type', 'remaining_qeroons', 'total_invested_qeroons',
+                  'auction_base_price', 'end_time',
+                  'discount_end_price', 'discount_start_price'
+                  )
+
     def create(self, validated_data):
-        auction_data = validated_data.get('auction')
-        discount_data = validated_data.get('discount')
         sender_type = validated_data.pop('sender_type')
-        validated_data.pop('sender_type', None)
         ads_included = validated_data.get('ads_included')
         remaining_qeroons = 0
         if sender_type == 2:
-            if auction_data is None:
+            if validated_data.get('auction_base_price') is None:
                 raise SendPostException(detail='auction data cant be null')
-            validate_dicount_time(auction_data.get('end_time'))
-            auction = Auction.objects.create(**auction_data)
-            validated_data.pop('auction', None)
-            validated_data.pop('price', None)
+            if validated_data.get('end_time') is None:
+                raise SendPostException(detail='auction end time cant be null')
             if ads_included:
-                remaining_qeroons = int(auction_data.get('base_money') * 0.001)
-            return Post.objects.create(auction=auction, price=0, remaining_qeroons=remaining_qeroons ,**validated_data)
+                remaining_qeroons = int(validated_data.get('auction_base_price') * 0.001)
+            # validate_dicount_time(validated_data.get('end_time'))
+            end_time = timezone.now() + timezone.timedelta(days=validated_data.pop('end_time'))
+            auction = Auction.objects.create(base_money=validated_data.pop('auction_base_price'),
+                                             end_time=end_time)
+            validated_data.pop('price')
+            return Post.objects.create(auction=auction, price=0, remaining_qeroons=remaining_qeroons, **validated_data)
         elif sender_type == 1:
-            if discount_data is None:
+            if validated_data.get('discount_start_price') is None:
                 raise SendPostException(detail='discount data cant be null')
-            validate_dicount_time(discount_data.get('end_time'))
-            discount = Discount.objects.create(**discount_data)
-            validated_data.pop('discount', None)
-            validated_data.pop('price', None)
+            if validated_data.get('discount_end_price') is None:
+                raise SendPostException(detail='discount data cant be null')
+            if validated_data.get('end_time') is None:
+                raise SendPostException(detail='discount end time cant be null')
             if ads_included:
-                remaining_qeroons = int(discount_data.get('start_price') * 0.001)
-            return Post.objects.create(discount=discount, price=0, remaining_qeroons=remaining_qeroons, **validated_data)
+                remaining_qeroons = int(validated_data.get('discount_start_price') * 0.001)
+            # validate_dicount_time(validated_data.get('end_time'))
+            end_time = timezone.now() + timezone.timedelta(days=validated_data.pop('end_time'))
+            discount = Discount.objects.create(start_price=validated_data.pop('discount_start_price'),
+                                               real_price=validated_data.pop('discount_end_price'),
+                                               end_time=end_time)
+            validated_data.pop('price', None)
+
+            return Post.objects.create(discount=discount, price=0, remaining_qeroons=remaining_qeroons,
+                                       **validated_data)
         else:
             if validated_data.get('price') < 1000:
                 raise SendPostException(detail='low price')
@@ -145,7 +174,6 @@ class FeedSerializer(serializers.ModelSerializer):
 
     def get_you_reposted(self, obj):
         return obj.post.reposters.filter(username=self.context['request'].user.username).exists()
-
 
 
 class FeedsUUIDSerializer(serializers.Serializer):

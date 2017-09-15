@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^report/', include('reports.urls')),
     url(r'^posts/', include('posts.urls')),
+    url(r'^helps/', include('helps.urls')),
     url(r'^profiles/', include('profiles.urls'),name='profiles'),
     url(r'^transactions/', include('transactions.urls')),
     url(r'^notifications/', include('notifications.urls')),

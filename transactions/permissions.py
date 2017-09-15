@@ -14,3 +14,8 @@ class IsOwnerOfTransactionsPost(permissions.BasePermission):
 class IsNotOwnerOfPost(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user != obj.post.sender
+
+
+class IsInvestorOfQeroonTransaction(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.user

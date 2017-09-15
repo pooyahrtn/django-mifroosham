@@ -121,7 +121,10 @@ class CancelBuy(APIView):
         now = timezone.now()
         if trans.buyer != self.request.user:
             raise NotAuthorized()
-        if now - trans.time < datetime.timedelta(hours=trans.post.deliver_time):
+        if trans.post.get_post_type == 2:
+            if now - trans.post.auction.end_time < datetime.timedelta(days=trans.post.deliver_time):
+                raise SoonForCancelException()
+        elif now - trans.time < datetime.timedelta(days=trans.post.deliver_time):
             raise SoonForCancelException()
         if trans.status == Transaction.CANCELED:
             raise AlreadyCanceled()
@@ -150,21 +153,24 @@ class DeliverItem(APIView):
             raise AlreadyCanceled()
         if serializer.validated_data['confirm_code'] != trans.confirm_code:
             raise WrongConfirmCode()
-        seller = trans.post.sender
+
         reposter = trans.reposter
         if reposter:
             Profile.objects.filter(user_id=reposter.pk).update(total_successful_reposts=
                                                                F('total_successful_reposts') + 1)
         if trans.post.ads_included:
-            Profile.objects.filter(user_id=seller.pk).update(money=F('money') + trans.suspended_money * 0.9)
+            Profile.objects.filter(user=trans.post.sender).update(money=F('money') + trans.suspended_money * 0.9)
             Profile.objects.filter(user=trans.buyer).update(qeroon=F('qeroon') + trans.post.total_invested_qeroons)
         else:
-            Profile.objects.filter(user_id=seller.pk).update(money=F('money') + trans.suspended_money)
+            Profile.objects.filter(user=trans.post.sender).update(money=F('money') + trans.suspended_money)
         trans.status = Transaction.DELIVERED
         trans.deliver_time = timezone.now()
         trans.rate_status = Transaction.CAN_RATE
         trans.save()
         QeroonTransaction.objects.give_investors_money(post=trans.post)
+        if trans.post.get_post_type == 2:
+            trans.post.disabled = trans.post.disable_after_buy
+            trans.post.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -229,6 +235,7 @@ class AuctionSuggestHigher(APIView):
             last_transaction.status = Transaction.CANCELED
             Profile.objects.filter(user_id=last_transaction.buyer.pk).update(money=F('money') + his_suspended_money)
             last_transaction.save()
+
         buyer_profile.save()
         auction.save()
         Transaction.objects.create(buyer=self.request.user, post=post, reposter=reposter)
@@ -277,3 +284,29 @@ class SoldTransactions(generics.ListAPIView):
     def filter_queryset(self, queryset):
         return Transaction.objects.filter(post__sender=self.request.user)
 
+
+class MyInvests(generics.ListAPIView):
+    queryset = QeroonTransaction.objects.all()
+    serializer_class = QeroonTransactionsSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def filter_queryset(self, queryset):
+        return QeroonTransaction.objects.filter(user=self.request.user)
+
+
+class ReturnInvest(APIView):
+    serializer_class = ReturnInvestSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        q_transaction = get_object_or_404(QeroonTransaction, uuid=serializer.validated_data['transaction_uuid'])
+        if q_transaction.user != self.request.user:
+            raise NotAuthorized()
+        Profile.objects.filter(user=q_transaction.user).update(qeroon=F('qeroon') + q_transaction.suspended_qeroon)
+        q_transaction.post.total_invested_qeroons = F('total_invested_qeroons') - q_transaction.suspended_qeroon
+        q_transaction.post.remaining_qeroons = F('remaining_qeroons') + q_transaction.suspended_qeroon
+        q_transaction.post.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)

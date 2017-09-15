@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'transactions.apps.TransactionsConfig',
     'reports.apps.ReportsConfig',
     'rest_framework.authtoken',
-    'notifications.apps.NotificationsConfig'
+    'notifications.apps.NotificationsConfig',
+    'helps.apps.HelpsConfig',
 ]
 
 MIDDLEWARE = [

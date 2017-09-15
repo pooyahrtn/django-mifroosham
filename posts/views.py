@@ -106,7 +106,7 @@ class Repost(generics.UpdateAPIView):
                 Feed(user=u, post=post, reposter=self.request.user, sort_value=value) for u in
                 reposter.follow.followers.all())
             Feed.objects.create(user=self.request.user, post=post, reposter=self.request.user,
-                                sort_value=value, buyable=False)
+                                sort_value=value)
             reposter.profile.total_reposts = F('total_reposts') + 1
             reposter.profile.save()
         else:
@@ -123,7 +123,7 @@ class Repost(generics.UpdateAPIView):
 
 class SendPost(generics.CreateAPIView):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = SendPostSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     @transaction.atomic
