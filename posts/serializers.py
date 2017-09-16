@@ -91,7 +91,7 @@ class PostSerializer(PostWithoutSenderSerializer):
         fields = ('sender', 'title', 'price', 'is_charity', 'image_url', 'description',
                   'discount', 'auction', 'disable_after_buy', 'deliver_time', 'ads_included',
                   'sender_type', 'remaining_qeroons', 'uuid', 'sent_time', 'total_invested_qeroons', 'n_likes',
-                  'n_reposters', 'post_type')
+                  'n_reposters', 'post_type', 'location')
         depth = 1
 
 
@@ -110,7 +110,7 @@ class SendPostSerializer(serializers.ModelSerializer):
                   'disable_after_buy', 'deliver_time', 'ads_included',
                   'sender_type', 'remaining_qeroons', 'total_invested_qeroons',
                   'auction_base_price', 'end_time',
-                  'discount_end_price', 'discount_start_price'
+                  'discount_end_price', 'discount_start_price', 'location'
                   )
 
     def create(self, validated_data):

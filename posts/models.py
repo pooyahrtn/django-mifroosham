@@ -53,6 +53,7 @@ class Post(models.Model):
     remaining_qeroons = models.PositiveIntegerField(default=0)
     total_invested_qeroons = models.PositiveIntegerField(default=0)
     ads_included = models.BooleanField(default=False)
+    location = models.CharField(max_length=14, null=True, blank=True)
 
     def __str__(self):
         return self.title

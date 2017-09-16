@@ -1,0 +1,8 @@
+{
+  "investment" : "{% include "helps/investment.md" %}",
+  "deliver_time": "{% include "helps/deliver_time.md" %}",
+  "discount": "{%include "helps/discount.md"%}",
+  "auction": "{%include "helps/auction.md"%}",
+  "location": "{% include "helps/location.md"%}",
+  "charity": "{% include "helps/charity.md"%}"
+}
