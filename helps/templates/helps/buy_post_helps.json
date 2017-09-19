@@ -1,0 +1,7 @@
+{
+  "deliver_time": "{% include "helps/buy_deliver_time.md" %}",
+  "charity": "{% include "helps/buy_charity.md"%}",
+  "qeroons": "{% include "helps/buy_qeroon.md"%}",
+  "phone_number" :"{% include "helps/buy_phone_number.md"%}",
+  "confirm_code": "{% include "helps/buy_confirm_code.md"%}"
+}

@@ -27,7 +27,7 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = (ConfirmPostFilter,)
     actions = ['make_published']
 
-    readonly_fields = ('image_tag',)
+    readonly_fields = ('image_tag_0','image_tag_1','image_tag_2','image_tag_3','image_tag_4','image_tag_5',)
 
     def make_published(self, request, queryset):
         rows_updated = queryset.update(confirmed_to_show=True)

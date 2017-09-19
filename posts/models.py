@@ -37,7 +37,13 @@ class Post(models.Model):
     price = models.BigIntegerField(blank=True, null=True)
     is_charity = models.BooleanField(default=False)
     # TODO:remove this null
-    image_url = models.ImageField(null=True, blank=True)
+    image_url_0 = models.ImageField(null=True, blank=True)
+    image_url_1 = models.ImageField(null=True, blank=True)
+    image_url_2 = models.ImageField(null=True, blank=True)
+    image_url_3 = models.ImageField(null=True, blank=True)
+    image_url_4 = models.ImageField(null=True, blank=True)
+    image_url_5 = models.ImageField(null=True, blank=True)
+    image_count = models.SmallIntegerField(default=1)
     description = models.CharField(max_length=600, blank=True)
     likes = models.ManyToManyField(to=User, blank=True, related_name='likes')
     reposters = models.ManyToManyField(to=User, blank=True, related_name='reposts')
@@ -54,6 +60,7 @@ class Post(models.Model):
     total_invested_qeroons = models.PositiveIntegerField(default=0)
     ads_included = models.BooleanField(default=False)
     location = models.CharField(max_length=14, null=True, blank=True)
+    next_buy_ben = models.BigIntegerField(default=0, blank=True)
 
     def __str__(self):
         return self.title
@@ -65,10 +72,24 @@ class Post(models.Model):
             return self.DISCOUNT_ITEM
         return self.NORMAL_ITEM
 
-    def image_tag(self):
-        return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.image_url)
+    def image_tag_0(self):
+        return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.image_url_0)
 
-    image_tag.short_description = 'Image'
+    def image_tag_1(self):
+        return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.image_url_1)
+
+    def image_tag_2(self):
+        return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.image_url_2)
+
+    def image_tag_3(self):
+        return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.image_url_3)
+
+    def image_tag_4(self):
+        return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.image_url_4)
+
+    def image_tag_5(self):
+        return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.image_url_5)
+
 
 
 class Comment(models.Model):

@@ -12,9 +12,19 @@ class Investment(APIView):
 
 
 class SendPostHelps(APIView):
-    serializer_class = serializers.SendPostSerializer
+
     def get(self, request, *args, **kwargs):
         template = loader.get_template('helps/send_post_helps.json')
         context = {}
         return HttpResponse(template.render(context, request))
+
+
+class BuyPostHelps(APIView):
+
+    def get(self, request, *args, **kwargs):
+        template = loader.get_template('helps/buy_post_helps.json')
+        context = {}
+        return HttpResponse(template.render(context, request))
+
+
 

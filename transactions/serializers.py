@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 class BuyTransactionSerializer(serializers.Serializer):
     post_uuid = serializers.UUIDField(label="post_uuid")
-    reposter_username = serializers.CharField(label='reposter_username')
+    reposter_username = serializers.CharField(label='reposter_username', allow_null=True)
 
     def validate(self, attrs):
         post_uuid = attrs.get('post_uuid')

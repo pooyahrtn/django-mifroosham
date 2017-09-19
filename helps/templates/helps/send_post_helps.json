@@ -4,5 +4,7 @@
   "discount": "{%include "helps/discount.md"%}",
   "auction": "{%include "helps/auction.md"%}",
   "location": "{% include "helps/location.md"%}",
-  "charity": "{% include "helps/charity.md"%}"
+  "charity": "{% include "helps/charity.md"%}",
+  "can_change_post": "{% include "helps/can_change_post.md"%}",
+  "verify_time": "{% include "helps/verify_time.md" %}"
 }
