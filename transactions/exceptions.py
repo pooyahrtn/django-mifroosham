@@ -38,7 +38,7 @@ class YouAreNotAuthorised(APIException):
 
 
 class MoneyException(APIException):
-    status_code = 519
+    status_code = 406
     default_code = 'low_money'
     default_detail = 'you dont have enough money'
 

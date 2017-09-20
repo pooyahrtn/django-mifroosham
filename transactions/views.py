@@ -199,7 +199,7 @@ class CancelSell(APIView):
 
 
 class AuctionSuggestHigher(APIView):
-    serializer_class = BuyTransactionSerializer
+    serializer_class = AuctionSuggestSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     @transaction.atomic
@@ -209,6 +209,8 @@ class AuctionSuggestHigher(APIView):
         post = serializer.validated_data['post']
         if self.request.user == post.sender:
             return Response('bad request', status=status.HTTP_401_UNAUTHORIZED)
+        if post.disabled or not post.confirmed_to_show:
+            return Response(data='this post is bought or disabled', status=status.HTTP_403_FORBIDDEN)
         higher_suggest = serializer.validated_data['higher_suggest']
         reposter = serializer.validated_data['reposter']
         buyer_profile = get_object_or_404(Profile.objects.select_for_update(), pk=self.request.user.pk)
@@ -226,10 +228,10 @@ class AuctionSuggestHigher(APIView):
             min_price = auction.base_money
 
         if higher_suggest < min_price:
-            raise MoneyException()
+            return Response(data='your suggest is less than the highest', status=413)
 
         auction.highest_suggest = higher_suggest
-        buyer_profile.money -= higher_suggest
+        buyer_profile.money = F('money') - higher_suggest
         for last_transaction in this_post_buyers:
             his_suspended_money = last_transaction.suspended_money
             last_transaction.status = Transaction.CANCELED
@@ -238,8 +240,11 @@ class AuctionSuggestHigher(APIView):
 
         buyer_profile.save()
         auction.save()
-        Transaction.objects.create(buyer=self.request.user, post=post, reposter=reposter)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        trans = Transaction.objects.create(buyer=self.request.user, post=post, reposter=reposter,
+                                           suspended_money=higher_suggest, confirm_code=random.randint(100000, 999999))
+        data = serializer.data
+        data['confirm_code'] = trans.confirm_code
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 class WriteReview(APIView):

@@ -146,9 +146,10 @@ class UserPosts(generics.ListAPIView):
 class PostDetail(generics.RetrieveAPIView):
     queryset = Post.objects.all()
     serializer_class = PostDetailSerializer
+    lookup_field = 'uuid'
 
     def get_object(self):
-        return Post.objects.get(pk=self.kwargs['pk'])
+        return Post.objects.get(uuid=self.kwargs['uuid'])
 
     def retrieve(self, request, *args, **kwargs):
         serializer = PostDetailSerializer(self.get_object())
