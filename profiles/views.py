@@ -1,6 +1,7 @@
 import random
 
 from django.db.models import Q, F
+from django.template import loader
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -150,3 +151,4 @@ class IncreaseViewingApp(APIView):
         profile.count_visiting_app = F('count_visiting_app') + 1
         profile.save()
         return Response(data=profile.count_visiting_app, status=status.HTTP_200_OK)
+

@@ -6,12 +6,12 @@ import time
 from django.utils import timezone
 from .exceptions import *
 
-
-# def validate_dicount_time(end_time):
-#     less = int(time.mktime(timezone.now().timetuple()))
-#     greater = int(time.mktime(end_time.timetuple()))
-#     if less > greater:
-#         raise serializers.ValidationError('end_time is greater than now')
+post_fields = ('sender', 'title', 'price', 'is_charity', 'image_url_0',
+               'image_url_1', 'image_url_2', 'image_url_3',
+               'image_url_4', 'image_url_5', 'description',
+               'discount', 'auction', 'disable_after_buy', 'deliver_time', 'ads_included',
+               'sender_type', 'remaining_qeroons', 'uuid', 'sent_time', 'total_invested_qeroons', 'n_likes',
+               'n_reposters', 'post_type', 'location')
 
 
 class AuctionSerializer(serializers.ModelSerializer):
@@ -30,13 +30,13 @@ class DiscountSerializer(serializers.ModelSerializer):
         model = Discount
         fields = ('start_price', 'real_price', 'start_time', 'end_time')
 
-    # def create(self, validated_data):
-    #      # validate_dicount_time(validated_data.get('end_time'))
-    #     # super(DiscountSerializer, self).create(validated_data)
-    #
-    # def update(self, instance, validated_data):
-    #     # validate_dicount_time(validated_data.get('end_time'))
-    #     # super(DiscountSerializer, self).update(instance, validated_data)
+        # def create(self, validated_data):
+        #      # validate_dicount_time(validated_data.get('end_time'))
+        #     # super(DiscountSerializer, self).create(validated_data)
+        #
+        # def update(self, instance, validated_data):
+        #     # validate_dicount_time(validated_data.get('end_time'))
+        #     # super(DiscountSerializer, self).update(instance, validated_data)
 
 
 class PostWithoutSenderSerializer(serializers.ModelSerializer):
@@ -87,12 +87,7 @@ class PostSerializer(PostWithoutSenderSerializer):
 
     class Meta:
         model = Post
-        fields = ('sender', 'title', 'price', 'is_charity', 'image_url_0',
-                  'image_url_1', 'image_url_2', 'image_url_3',
-                  'image_url_4', 'image_url_5', 'description',
-                  'discount', 'auction', 'disable_after_buy', 'deliver_time', 'ads_included',
-                  'sender_type', 'remaining_qeroons', 'uuid', 'sent_time', 'total_invested_qeroons', 'n_likes',
-                  'n_reposters', 'post_type', 'location')
+        fields = post_fields
         depth = 1
 
 
@@ -126,6 +121,8 @@ class SendPostSerializer(serializers.ModelSerializer):
         ads_included = validated_data.get('ads_included')
         remaining_qeroons = 0
         image_count = 1
+        if validated_data.get('deliver_time') < 1:
+            raise SendPostException(detail='really? you will deliver it in the past?!')
         if validated_data.get('image_url_1') is not None:
             image_count += 1
             if validated_data.get('image_url_2') is not None:
@@ -151,7 +148,8 @@ class SendPostSerializer(serializers.ModelSerializer):
             auction = Auction.objects.create(base_money=validated_data.pop('auction_base_price'),
                                              end_time=end_time)
             validated_data.pop('price')
-            return Post.objects.create(auction=auction, price=0, image_count=image_count,remaining_qeroons=remaining_qeroons, **validated_data)
+            return Post.objects.create(auction=auction, price=0, image_count=image_count,
+                                       remaining_qeroons=remaining_qeroons, **validated_data)
         elif sender_type == 1:
             if validated_data.get('discount_start_price') is None:
                 raise SendPostException(detail='discount data cant be null')
@@ -172,7 +170,8 @@ class SendPostSerializer(serializers.ModelSerializer):
                                                end_time=end_time)
             validated_data.pop('price', None)
 
-            return Post.objects.create(discount=discount, image_count=image_count,price=0, remaining_qeroons=remaining_qeroons,
+            return Post.objects.create(discount=discount, image_count=image_count, price=0,
+                                       remaining_qeroons=remaining_qeroons,
                                        **validated_data)
         else:
             if validated_data.get('price') < 1000:
@@ -182,7 +181,7 @@ class SendPostSerializer(serializers.ModelSerializer):
                                         '')
             if ads_included:
                 remaining_qeroons = int(validated_data.get('price') * 0.001)
-        return Post.objects.create(remaining_qeroons=remaining_qeroons, image_count=image_count,**validated_data)
+        return Post.objects.create(remaining_qeroons=remaining_qeroons, image_count=image_count, **validated_data)
 
 
 class FeedSerializer(serializers.ModelSerializer):
@@ -215,7 +214,7 @@ class PostDetailSerializer(PostSerializer):
 
     class Meta:
         model = Post
-        exclude = ('likes', 'id', 'confirmed_to_show', 'waiting_to_confirm')
+        fields = post_fields + ('you_liked', )
 
 
 class UserWithPostSerializer(serializers.ModelSerializer):

@@ -6,6 +6,8 @@ import uuid as uuid_lib
 from profiles.models import Review
 from datetime import datetime
 
+qeroon_value = 100
+
 
 class Transaction(models.Model):
     PENDING = 'pe'
@@ -41,8 +43,8 @@ class Transaction(models.Model):
     )
     suspended_money = models.BigIntegerField()
     time = models.DateTimeField(auto_now_add=True)
-    deliver_time = models.DateTimeField(null=True)
-    cancel_time = models.DateTimeField(null=True)
+    deliver_time = models.DateTimeField(null=True, blank=True)
+    cancel_time = models.DateTimeField(null=True, blank=True)
     reposter = models.ForeignKey(to=User, null=True, blank=True, related_name='reposted_transaction')
     confirm_code = models.IntegerField(default=0)
     rate_status = models.CharField(
@@ -51,9 +53,12 @@ class Transaction(models.Model):
         default=NOT_RATEABLE
     )
     review = models.OneToOneField(Review, blank=True, null=True, related_name='transaction')
+    auction_failed = models.BooleanField(default=False)
+    deleted_by_sender = models.BooleanField(default=False)
+    deleted_by_buyer = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['pk']
+        ordering = ['-pk']
 
     def __str__(self):
         return self.post.title + ' buyer: ' + self.buyer.username

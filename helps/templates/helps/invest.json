@@ -1,0 +1,6 @@
+{
+  "qeroon_value": "{{qeroon_value}}",
+  "explaination": "{% include "helps/invest_explanation.md"%}",
+  "your_qeroons": "{{your_qeroons}}"
+
+}

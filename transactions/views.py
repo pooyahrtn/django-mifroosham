@@ -1,5 +1,7 @@
 from django.db.models import F
 from django.db.models import Q
+from django.http import HttpResponse
+from django.template import loader
 from rest_framework.views import APIView
 from profiles.models import Profile, Review
 from rest_framework import generics
@@ -15,7 +17,7 @@ from .exceptions import *
 from .permissions import *
 import datetime
 from notifications.models import TransactionNotification
-from .models import QeroonTransaction
+from .models import QeroonTransaction, qeroon_value
 import random
 
 
@@ -198,6 +200,34 @@ class CancelSell(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class DeleteTransaction(APIView):
+    serializer_class = GetTransactionSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        trans = serializer.validated_data['transaction']
+        if trans.post.sender == self.request.user:
+            requester_is_sender = True
+        elif trans.buyer == self.request.user:
+            requester_is_sender = False
+        else:
+            return Response('not authorized', status=status.HTTP_401_UNAUTHORIZED)
+        if trans.status == Transaction.DELIVERED or trans.status == Transaction.CANCELED:
+
+            if requester_is_sender:
+                trans.deleted_by_sender = True
+            else:
+                trans.deleted_by_buyer = True
+            trans.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        else:
+            return Response('transaction can not be deleted cos it is not delivered or canceled')
+
+
 class AuctionSuggestHigher(APIView):
     serializer_class = AuctionSuggestSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -235,6 +265,7 @@ class AuctionSuggestHigher(APIView):
         for last_transaction in this_post_buyers:
             his_suspended_money = last_transaction.suspended_money
             last_transaction.status = Transaction.CANCELED
+            last_transaction.auction_failed = True
             Profile.objects.filter(user_id=last_transaction.buyer.pk).update(money=F('money') + his_suspended_money)
             last_transaction.save()
 
@@ -278,7 +309,7 @@ class BoughtTransactions(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def filter_queryset(self, queryset):
-        return Transaction.objects.filter(buyer=self.request.user)
+        return Transaction.objects.filter(buyer=self.request.user, deleted_by_buyer=False)
 
 
 class SoldTransactions(generics.ListAPIView):
@@ -287,7 +318,7 @@ class SoldTransactions(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def filter_queryset(self, queryset):
-        return Transaction.objects.filter(post__sender=self.request.user)
+        return Transaction.objects.filter(post__sender=self.request.user, deleted_by_sender=False)
 
 
 class MyInvests(generics.ListAPIView):
@@ -315,3 +346,12 @@ class ReturnInvest(APIView):
         q_transaction.post.remaining_qeroons = F('remaining_qeroons') + q_transaction.suspended_qeroon
         q_transaction.post.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class InvestHelps(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        template = loader.get_template('helps/invest.json')
+        context = {'qeroon_value': qeroon_value, 'your_qeroons': self.request.user.profile.qeroon}
+        return HttpResponse(template.render(context, request))
