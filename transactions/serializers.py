@@ -48,7 +48,7 @@ class InvestOnPostSerializer(serializers.Serializer):
 
 
 transaction_base_fields = ('post', 'status', 'buyer', 'suspended_money', 'deliver_time', 'cancel_time',
-                           'reposter', 'uuid', 'review','time', 'rate_status')
+                           'reposter', 'uuid', 'review', 'time', 'rate_status', 'auction_failed')
 
 
 class TransactionSerializer(serializers.ModelSerializer):

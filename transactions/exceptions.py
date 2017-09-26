@@ -43,7 +43,7 @@ class MoneyException(APIException):
     default_detail = 'you dont have enough money'
 
 class WrongConfirmCode(APIException):
-    status_code = 520
+    status_code = 420
     default_code = 'wrong_confirmation_code'
     default_detail = 'wrong confirmation code'
 

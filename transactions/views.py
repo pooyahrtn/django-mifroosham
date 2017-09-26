@@ -243,7 +243,7 @@ class AuctionSuggestHigher(APIView):
             return Response(data='this post is bought or disabled', status=status.HTTP_403_FORBIDDEN)
         higher_suggest = serializer.validated_data['higher_suggest']
         reposter = serializer.validated_data['reposter']
-        buyer_profile = get_object_or_404(Profile.objects.select_for_update(), pk=self.request.user.pk)
+        buyer_profile = get_object_or_404(Profile.objects.select_for_update(), user=self.request.user)
         auction = get_object_or_404(Auction.objects.select_for_update(), pk=post.auction_id)
         if higher_suggest > buyer_profile.money:
             raise MoneyException()
@@ -265,6 +265,7 @@ class AuctionSuggestHigher(APIView):
         for last_transaction in this_post_buyers:
             his_suspended_money = last_transaction.suspended_money
             last_transaction.status = Transaction.CANCELED
+            last_transaction.cancel_time = timezone.now()
             last_transaction.auction_failed = True
             Profile.objects.filter(user_id=last_transaction.buyer.pk).update(money=F('money') + his_suspended_money)
             last_transaction.save()
@@ -291,14 +292,22 @@ class WriteReview(APIView):
             raise NotAuthorized()
         if trans.rate_status == Transaction.NOT_RATEABLE:
             raise NotAuthorized('you can not rate this transaction')
-        if trans.rate_status == Transaction.RATED:
-            raise NotAuthorized('you already rated this post')
         review = trans.review
-        if not review:
-            trans.review = Review.objects.write_review(for_user=trans.post.sender, reviewer=trans.buyer,
-                                                       rate=serializer.validated_data['rate'],
-                                                       comment=serializer.validated_data['comment'])
-            trans.save()
+
+        if trans.rate_status == Transaction.RATED:
+            if not review:
+                raise NotAuthorized('shit happened, transaction has no review')
+            Review.objects.change_review(review, for_user=trans.post.sender, rate=serializer.validated_data['rate'],
+                                         comment=serializer.validated_data['comment'])
+        else:
+            if not review:
+                trans.review = Review.objects.write_review(for_user=trans.post.sender, reviewer=trans.buyer,
+                                                           rate=serializer.validated_data['rate'],
+                                                           comment=serializer.validated_data['comment'])
+                trans.rate_status = Transaction.RATED
+                trans.save()
+            else:
+                raise NotAuthorized('shit happened, transaction already has review')
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -318,7 +327,7 @@ class SoldTransactions(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def filter_queryset(self, queryset):
-        return Transaction.objects.filter(post__sender=self.request.user, deleted_by_sender=False)
+        return Transaction.objects.filter(post__sender=self.request.user, deleted_by_sender=False, auction_failed=False)
 
 
 class MyInvests(generics.ListAPIView):

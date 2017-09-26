@@ -70,6 +70,14 @@ class ReviewManager(models.Manager):
                     )
         return self.create(**kwargs)
 
+    def change_review(self, last_review, **kwargs):
+        if kwargs['rate'] > 5 or kwargs['rate'] < 0:
+            return
+
+        Profile.objects.filter(user=kwargs['for_user']) \
+            .update(score=(F('score') * F('count_of_rates') + kwargs['rate'] - last_review.rate) / (F('count_of_rates')))
+        self.filter(pk=last_review.pk).update(**kwargs)
+
 
 class Review(models.Model):
     for_user = models.ForeignKey(User, related_name='reviews')

@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^write_review/$', WriteReview.as_view()),
     url(r'^delete_transaction/$', DeleteTransaction.as_view()),
     # url(r'^confirm_sell/(?P<uuid>[0-9A-Fa-f-]+)$', ConfirmSell.as_view()),
-    url(r'^deliver$', DeliverItem.as_view()),
+    url(r'^deliver_item/$', DeliverItem.as_view()),
     url(r'^auction_suggest_higher', AuctionSuggestHigher.as_view()),
     url(r'^cancel_sell$', CancelSell.as_view()),
     url(r'^bought/$', BoughtTransactions.as_view()),

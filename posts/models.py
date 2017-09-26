@@ -129,7 +129,7 @@ class Feed(models.Model):
         return self.post.title
 
     class Meta:
-        ordering = ['read', '-sort_version', '-sort_value', 'pk']
+        ordering = ['read', '-sort_version', '-sort_value', '-pk']
 
         #
         # @receiver(post_save, sender=Post)
