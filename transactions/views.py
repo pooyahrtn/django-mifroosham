@@ -1,9 +1,12 @@
+from collections import OrderedDict
+
 from django.db.models import F
 from django.db.models import Q
 from django.http import HttpResponse
 from django.template import loader
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
-from profiles.models import Profile, Review
+from profiles.models import Profile, Review, PhoneNumber
 from rest_framework import generics
 from django.db import transaction
 from posts.models import Auction, Discount
@@ -111,6 +114,7 @@ class InvestOnPost(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# todo: check for disable...
 class CancelBuy(APIView):
     serializer_class = GetTransactionSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -171,13 +175,14 @@ class DeliverItem(APIView):
         trans.save()
         QeroonTransaction.objects.give_investors_money(post=trans.post)
         if trans.post.get_post_type == 2:
-            trans.post.disabled = trans.post.disable_after_buy
+            trans.post.disabled = True
             trans.post.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# todo: check for disable...
 class CancelSell(APIView):
-    serializer_class = GetTransactionSerializer
+    serializer_class = CancelSellTransactionSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     @transaction.atomic
@@ -191,8 +196,10 @@ class CancelSell(APIView):
             raise AlreadyDelivered()
         if trans.status == Transaction.CANCELED:
             raise AlreadyCanceled()
-            # if not trans.confirmed:
-            #     raise AlreadyConfirmed()
+        if serializer.validated_data['disable_post']:
+            Post.objects.filter(pk=trans.post.pk).update(disabled=True)
+        else:
+            Post.objects.filter(pk=trans.post.pk).update(disabled=False)
         Profile.objects.filter(user_id=trans.buyer.pk).update(money=F('money') + trans.suspended_money)
         trans.status = Transaction.CANCELED
         trans.cancel_time = timezone.now()
@@ -312,22 +319,59 @@ class WriteReview(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class TransactionPaginator(PageNumberPagination):
+    def get_paginated_response(self, data):
+        return Response(OrderedDict([
+            ('new_messages', self.new_messages),
+            ('count', self.page.paginator.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data)
+        ]))
+
+
 class BoughtTransactions(generics.ListAPIView):
     queryset = Transaction.objects.all()
     serializer_class = BoughtTransactionsSerializer
     permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = TransactionPaginator
 
     def filter_queryset(self, queryset):
         return Transaction.objects.filter(buyer=self.request.user, deleted_by_buyer=False)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        new_messages = queryset.filter(status=Transaction.PENDING).count()
+        self.paginator.new_messages = new_messages
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class SoldTransactions(generics.ListAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
     permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = TransactionPaginator
 
     def filter_queryset(self, queryset):
         return Transaction.objects.filter(post__sender=self.request.user, deleted_by_sender=False, auction_failed=False)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        new_messages = queryset.filter(status=Transaction.PENDING).count()
+        self.paginator.new_messages = new_messages
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class MyInvests(generics.ListAPIView):
@@ -364,3 +408,21 @@ class InvestHelps(APIView):
         template = loader.get_template('helps/invest.json')
         context = {'qeroon_value': qeroon_value, 'your_qeroons': self.request.user.profile.qeroon}
         return HttpResponse(template.render(context, request))
+
+
+class GetPhoneNumber(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = GetPhoneNumberSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        trans = serializer.validated_data['transaction']
+        if self.request.user == trans.buyer:
+            serializer.validated_data['phone_number'] = PhoneNumber.objects.get(user=trans.post.sender).number
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif self.request.user == trans.post.sender:
+            serializer.validated_data['phone_number'] = PhoneNumber.objects.get(user=trans.buyer).number
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response('you are bad. not the buyer nor the sender', status=status.HTTP_401_UNAUTHORIZED)

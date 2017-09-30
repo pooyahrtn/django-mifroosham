@@ -23,4 +23,4 @@ class TransactionNotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TransactionNotification
-        exclude = ('id','user')
+        fields = ('status', 'uuid', 'time', 'transaction')

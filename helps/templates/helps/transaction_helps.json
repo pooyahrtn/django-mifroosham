@@ -1,0 +1,4 @@
+{
+  "cancel_sell_alert" : "{% include "helps/transactions/cancel_sell_alert.md" %}",
+  "cancel_sell_auction_alert" : "{% include "helps/transactions/cancel_sell_auction_alert.md" %}"
+}

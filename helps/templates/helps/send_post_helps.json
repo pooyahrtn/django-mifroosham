@@ -6,5 +6,6 @@
   "location": "{% include "helps/location.md"%}",
   "charity": "{% include "helps/charity.md"%}",
   "can_change_post": "{% include "helps/can_change_post.md"%}",
-  "verify_time": "{% include "helps/verify_time.md" %}"
+  "verify_time": "{% include "helps/verify_time.md" %}",
+  "disable_after_buy" : "{% include "helps/sendpost/disable_after_buy.md" %}"
 }

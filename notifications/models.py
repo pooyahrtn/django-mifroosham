@@ -10,8 +10,10 @@ class TransactionNotificationManager(models.Manager):
     def create_notification(self, transaction, user, status):
         notification = self.model(transaction=transaction, user=user, status=status)
         notification.save()
-        tasks.send_notification_sms.delay(phone_number=user.phone_number.number, status=status, deliver_time=transaction.post.deliver_time)
-        tasks.send_push_notification.delay(id=user.notification_token.token, status=status, title=transaction.post.title)
+        tasks.send_notification_sms.delay(phone_number=user.phone_number.number, status=status,
+                                          deliver_time=transaction.post.deliver_time)
+        tasks.send_push_notification.delay(id=user.notification_token.token, status=status,
+                                           title=transaction.post.title, transaction_uuid=transaction.uuid)
 
 
 class TransactionNotification(models.Model):
@@ -19,12 +21,14 @@ class TransactionNotification(models.Model):
     SELL = "SE"
     AUCTION = "AU"
     DELIVERED = "DE"
+    AUCTION_FAILED = "AF"
 
     NOTIFICATION_TYPES = (
         (BUY, "buy"),
         (SELL, 'sell'),
         (AUCTION, 'auction'),
-        (DELIVERED, 'delivered')
+        (DELIVERED, 'delivered'),
+        (AUCTION_FAILED, 'auction_failed')
     )
     uuid = models.UUIDField(
         db_index=True,
@@ -39,6 +43,8 @@ class TransactionNotification(models.Model):
     time = models.DateTimeField(auto_now_add=True, null=True)
     objects = TransactionNotificationManager()
 
+    def __str__(self):
+        return self.transaction.post.title + ' : ' + self.user.username
 
 class PostNotification(models.Model):
     LIKE = 'li'

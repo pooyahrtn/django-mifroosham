@@ -103,7 +103,7 @@ class Repost(generics.UpdateAPIView):
                                   reposter.profile.total_successful_reposts / reposter.profile.total_reposts)
 
             Feed.objects.bulk_create(
-                Feed(user=u, post=post, reposter=self.request.user, sort_value=value) for u in
+                Feed(user=u, post=post, reposter=self.request.user, sort_value=value, buyable=u.pk != post.sender.pk) for u in
                 reposter.follow.followers.all())
             Feed.objects.create(user=self.request.user, post=post, reposter=self.request.user,
                                 sort_value=value)

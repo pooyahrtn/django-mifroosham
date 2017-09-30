@@ -27,4 +27,12 @@ class BuyPostHelps(APIView):
         return HttpResponse(template.render(context, request))
 
 
+class TransactionHelps(APIView):
+
+    def get(self, request, *args, **kwargs):
+        template = loader.get_template('helps/transaction_helps.json')
+        context = {}
+        return HttpResponse(template.render(context, request))
+
+
 

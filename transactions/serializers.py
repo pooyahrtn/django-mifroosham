@@ -33,6 +33,10 @@ class GetTransactionSerializer(serializers.Serializer):
         return attrs
 
 
+class CancelSellTransactionSerializer(GetTransactionSerializer):
+    disable_post = serializers.BooleanField()
+
+
 class DeliverTransactionSerializer(GetTransactionSerializer):
     confirm_code = serializers.IntegerField()
 
@@ -99,3 +103,7 @@ class QeroonTransactionsSerializer(serializers.ModelSerializer):
 class ReturnInvestSerializer(serializers.Serializer):
     transaction_uuid = serializers.UUIDField()
     qeroons = serializers.IntegerField(read_only=True)
+
+
+class GetPhoneNumberSerializer(GetTransactionSerializer):
+    phone_number = serializers.CharField(required=False, max_length=20)
