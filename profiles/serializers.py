@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from . import exceptions
-from .models import Profile, PhoneNumber, PhoneNumberConfirmation, Review
+from .models import Profile, PhoneNumber, PhoneNumberConfirmation, Review, Follow
 from django.contrib.auth.models import User
 from django.utils import timezone
+
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -12,7 +13,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('score', 'avatar_url', 'bio', 'full_name', 'count_of_rates')
+        fields = ('score', 'avatar_url', 'bio', 'full_name', 'count_of_rates', 'location', 'show_phone_number')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,6 +23,20 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'profile')
         depth = 1
+
+
+class FollowNumberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields = ('n_followers', 'n_followings')
+
+
+class UserWithFollowCountSerializer(UserSerializer):
+    follow = FollowNumberSerializer()
+
+    class Meta:
+        model = User
+        fields = ('username', 'profile', 'follow')
 
 
 class UserWithoutProfileSerializer(serializers.ModelSerializer):
@@ -53,7 +68,9 @@ class MyProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('money', 'score', 'count_of_rates', 'avatar_url', 'user', 'full_name', 'show_phone_number', 'location', 'bio')
+        fields = (
+            'money', 'score', 'count_of_rates', 'avatar_url', 'user', 'full_name', 'show_phone_number', 'location',
+            'bio')
 
 
 class UpdateProfilePhotoSerializer(serializers.ModelSerializer):
@@ -142,6 +159,7 @@ class AuthTokenSerializer(serializers.Serializer):
 class ReviewSerializer(serializers.ModelSerializer):
     reviewer = UserSerializer(read_only=True)
 
+
     class Meta:
         model = Review
-        fields = ('rate', 'comment', 'reviewer')
+        fields = ('rate', 'comment', 'reviewer', 'uuid', 'transaction', 'image_url')

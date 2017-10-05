@@ -1,8 +1,9 @@
 from collections import OrderedDict
 
 from django.db.models import F
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from .models import Post, Feed, Comment, Suggest
+from .models import Post, Feed, Comment, Suggest, ProfilePost
 from .serializers import *
 from rest_framework.response import Response
 from profiles.serializers import UserSerializer
@@ -42,9 +43,16 @@ class FeedList(generics.ListAPIView):
 
         if request.GET.get('page') is None:
             self.request.user.profile.count_visiting_app += 1
+            version += 1
             self.request.user.profile.save()
         self.paginator.visit_version = version
         if page is not None:
+            #todo: make it better
+            pks = []
+            for obj in page:
+                if not obj.read:
+                    pks.append(obj.pk)
+            Feed.objects.filter(pk__in=pks).update(read=True, sort_version=version)
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
@@ -52,15 +60,15 @@ class FeedList(generics.ListAPIView):
         return Response(serializer.data)
 
 
-class ReadFeeds(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def post(self, request, *args, **kwargs):
-        serializer = FeedsUUIDSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        Feed.objects.read_feeds(serializer.validated_data['uuids'], self.request.user,
-                                serializer.validated_data['visiting_version'])
-        return Response(serializer.validated_data, status.HTTP_200_OK)
+# class ReadFeeds(APIView):
+#     permission_classes = (permissions.IsAuthenticated,)
+#
+#     def post(self, request, *args, **kwargs):
+#         serializer = FeedsUUIDSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         Feed.objects.read_feeds(serializer.validated_data['uuids'], self.request.user,
+#                                 serializer.validated_data['visiting_version'])
+#         return Response(serializer.validated_data, status.HTTP_200_OK)
 
 
 class LikePost(generics.UpdateAPIView):
@@ -103,10 +111,12 @@ class Repost(generics.UpdateAPIView):
                                   reposter.profile.total_successful_reposts / reposter.profile.total_reposts)
 
             Feed.objects.bulk_create(
-                Feed(user=u, post=post, reposter=self.request.user, sort_value=value, buyable=u.pk != post.sender.pk) for u in
+                Feed(user=u, post=post, reposter=self.request.user, sort_value=value, buyable=u.pk != post.sender.pk)
+                for u in
                 reposter.follow.followers.all())
             Feed.objects.create(user=self.request.user, post=post, reposter=self.request.user,
                                 sort_value=value)
+            ProfilePost.objects.create(user=self.request.user, post=post, is_repost=True)
             reposter.profile.total_reposts = F('total_reposts') + 1
             reposter.profile.save()
         else:
@@ -116,6 +126,7 @@ class Repost(generics.UpdateAPIView):
                                 , post=post, reposter=self.request.user).delete()
             Feed.objects.filter(user=self.request.user
                                 , post=post, reposter=self.request.user).delete()
+            ProfilePost.objects.filter(user=self.request.user, post=post).delete()
             reposter.profile.total_reposts = F('total_reposts') - 1
             reposter.profile.save()
         serializer.save(user=self.request.user, reposted=reposted, n_reposters=post.n_reposters + increment)
@@ -151,12 +162,6 @@ class PostDetail(generics.RetrieveAPIView):
     def get_object(self):
         return Post.objects.get(uuid=self.kwargs['uuid'])
 
-    # def retrieve(self, request, *args, **kwargs):
-    #     serializer = PostDetailSerializer(self.get_object())
-    #     data = serializer.data
-    #     data['you_liked'] = self.get_object().likes.filter(username=self.request.user.username).exists()
-    #     return Response(data)
-
 
 class PostLikers(generics.ListAPIView):
     queryset = User.objects.all()
@@ -166,18 +171,45 @@ class PostLikers(generics.ListAPIView):
         return Post.objects.get(pk=self.kwargs['pk']).likes.all()
 
 
-class Comments(generics.ListCreateAPIView):
+class Comments(generics.ListAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    lookup_field = 'uuid'
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return Comment.objects.filter(post_id=self.kwargs['pk'])
+        return Comment.objects.filter(post__uuid=self.kwargs['uuid'])
 
-    def perform_create(self, serializer):
-        sender = self.request.user
-        post = Post.objects.get(pk=self.kwargs['pk'])
-        serializer.save(user=sender, post=post)
+
+class AddComment(APIView):
+    serializer_class = BaseCommentSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        post = get_object_or_404(Post.objects.all(), uuid=serializer.validated_data['post_uuid'])
+        comment = Comment.objects.add_comment(from_user=self.request.user, text=serializer.validated_data['comment'],
+                                              post=post)
+        comment_serializer = CommentSerializer(comment)
+        return Response(data=comment_serializer.data, status=status.HTTP_200_OK)
+
+
+class DeleteComment(APIView):
+    serializer_class = DeleteCommentSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        comment = get_object_or_404(Comment.objects.all(), uuid=serializer.validated_data['comment_uuid'])
+        if comment.user != self.request.user:
+            return Response(data='not authorized', status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            Comment.objects.delete_comment(comment)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class SuggestPost(generics.ListCreateAPIView):
@@ -193,4 +225,10 @@ class SuggestPost(generics.ListCreateAPIView):
         return Suggest.objects.filter(suggest_to=self.request.user)
 
 
+class UserPosts(generics.ListAPIView):
+    queryset = ProfilePost.objects.all()
+    serializer_class = ProfilePostSerializer
+    lookup_field = 'username'
 
+    def filter_queryset(self, queryset):
+        return ProfilePost.objects.filter(user__username=self.kwargs['username'])

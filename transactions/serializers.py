@@ -107,3 +107,11 @@ class ReturnInvestSerializer(serializers.Serializer):
 
 class GetPhoneNumberSerializer(GetTransactionSerializer):
     phone_number = serializers.CharField(required=False, max_length=20)
+
+
+class TransactionPostSerializer(serializers.ModelSerializer):
+    post = PostSerializer(read_only=True)
+
+    class Meta:
+        model = Transaction
+        fields = ('post',)

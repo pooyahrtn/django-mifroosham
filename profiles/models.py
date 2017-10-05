@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.safestring import mark_safe
 from rest_framework.authtoken.models import Token
+import uuid as uuid_lib
 
 
 class Profile(models.Model):
@@ -84,7 +85,11 @@ class Review(models.Model):
     reviewer = models.ForeignKey(User, related_name='wrote_reviews')
     rate = models.SmallIntegerField(default=5)
     comment = models.CharField(max_length=400, null=True, blank=True)
-
+    image_url = models.ImageField(null=True, blank=True)
+    uuid = models.UUIDField(
+        db_index=True,
+        default=uuid_lib.uuid4,
+        editable=False)
     objects = ReviewManager()
 
     def __str__(self):

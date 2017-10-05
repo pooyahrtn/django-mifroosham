@@ -1,5 +1,5 @@
-from rest_framework import serializers
-from .models import Post, Feed, Auction, Discount, Comment, Suggest
+from rest_framework import serializers, pagination
+from .models import Post, Feed, Auction, Discount, Comment, Suggest, ProfilePost
 from django.contrib.auth.models import User
 from profiles.serializers import UserSerializer, ProfileSerializer
 import time
@@ -11,7 +11,7 @@ post_fields = ('sender', 'title', 'price', 'is_charity', 'image_url_0',
                'image_url_4', 'image_url_5', 'description',
                'discount', 'auction', 'disable_after_buy', 'deliver_time', 'ads_included',
                'sender_type', 'remaining_qeroons', 'uuid', 'sent_time', 'total_invested_qeroons', 'n_likes',
-               'n_reposters', 'post_type', 'location')
+               'n_reposters', 'post_type', 'location', 'n_comments')
 
 
 class AuctionSerializer(serializers.ModelSerializer):
@@ -217,23 +217,22 @@ class PostDetailSerializer(PostSerializer):
         fields = post_fields + ('you_liked', )
 
 
-class UserWithPostSerializer(serializers.ModelSerializer):
-    posts = PostWithoutSenderSerializer(read_only=True, many=True)
-    profile = ProfileSerializer(read_only=True)
-
-    class Meta:
-        model = User
-        fields = ('posts', 'profile', 'username')
-        depth = 2
-
-
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    time = serializers.ReadOnlyField()
+    time = serializers.ReadOnlyField(read_only=True)
 
     class Meta:
         model = Comment
-        fields = ('text', 'time', 'user')
+        fields = ('text', 'time', 'user', 'uuid')
+
+
+class BaseCommentSerializer(serializers.Serializer):
+    post_uuid = serializers.UUIDField()
+    comment = serializers.CharField(max_length=400)
+
+
+class DeleteCommentSerializer(serializers.Serializer):
+    comment_uuid = serializers.UUIDField()
 
 
 class SuggestSerializer(serializers.ModelSerializer):
@@ -252,3 +251,11 @@ class SuggestSerializer(serializers.ModelSerializer):
         suggested_to = User.objects.get(username=validated_data.get('suggest_to_username'))
         post = Post.objects.get(pk=validated_data.get('post_id'))
         return Suggest.objects.create(suggest_to=suggested_to, suggester=validated_data.get('suggester'), post=post)
+
+
+class ProfilePostSerializer(serializers.ModelSerializer):
+    post = PostSerializer(read_only=True)
+
+    class Meta:
+        model = ProfilePost
+        fields = ('is_repost', 'post')

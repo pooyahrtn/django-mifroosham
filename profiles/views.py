@@ -1,31 +1,30 @@
 import random
 
 from django.db.models import Q, F
+from django.shortcuts import get_object_or_404
 from django.template import loader
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from posts.models import Feed
-from .models import User, Profile, PhoneNumberConfirmation
+from posts.models import Feed, ProfilePost
 from .serializers import *
-from posts.serializers import UserWithPostSerializer
 from rest_framework import generics, parsers, renderers, status
 from django.db import transaction
 from .tasks import send_sms
 from .exceptions import *
 from .permissions import *
-import requests
 import datetime
 
 
 def change_follower_feed(follower, who_followed, is_followed):
     if is_followed:
-        for post in who_followed.posts.filter(confirmed_to_show=True):
-            Feed.objects.create(user=follower, post=post, sort_time=post.sent_time, read=True)
+        posts = who_followed.posts.filter(confirmed_to_show=True)[:10]
+        Feed.objects.bulk_create(
+            Feed(user=follower, post=post, sort_value=random.randint(0, 2147483647), buyable=True)
+            for post in
+            posts)
     else:
-        for post in who_followed.posts.all():
-            Feed.objects.filter(Q(user=follower), Q(post=post) | Q(reposter=who_followed)).delete()
+        Feed.objects.filter(Q(user=follower), Q(post__in=who_followed.posts.all()) | Q(reposter=who_followed)).delete()
 
 
 class FollowUser(generics.UpdateAPIView):
@@ -56,7 +55,7 @@ class FollowUser(generics.UpdateAPIView):
 
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
-    serializer_class = UserWithPostSerializer
+    serializer_class = UserWithFollowCountSerializer
     lookup_field = 'username'
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
@@ -65,7 +64,9 @@ class UserDetail(generics.RetrieveAPIView):
         serializer = self.get_serializer(instance)
         data = serializer.data
         if not self.request.user.is_anonymous:
-            data['following'] = self.request.user.followings.filter(user=self.get_object()).exists()
+            data['you_follow'] = self.request.user.followings.filter(user=self.get_object()).exists()
+            if instance.pk == self.request.user.pk:
+                data['money'] = instance.profile.money
         return Response(data)
 
 
@@ -152,3 +153,12 @@ class IncreaseViewingApp(APIView):
         profile.save()
         return Response(data=profile.count_visiting_app, status=status.HTTP_200_OK)
 
+
+class UserReviews(generics.ListAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    lookup_field = 'username'
+
+    def filter_queryset(self, queryset):
+        user = get_object_or_404(User, username=self.kwargs['username'])
+        return Review.objects.filter(for_user=user)

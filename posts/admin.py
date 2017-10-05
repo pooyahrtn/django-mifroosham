@@ -2,7 +2,7 @@ import re
 from django.contrib import admin
 
 from posts.utils import value_of_feed
-from .models import Post, Feed, Auction, Discount
+from .models import Post, Feed, Auction, Discount, ProfilePost
 
 
 class ConfirmPostFilter(admin.SimpleListFilter):
@@ -27,7 +27,7 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = (ConfirmPostFilter,)
     actions = ['make_published']
 
-    readonly_fields = ('image_tag_0','image_tag_1','image_tag_2','image_tag_3','image_tag_4','image_tag_5',)
+    readonly_fields = ('image_tag_0', 'image_tag_1', 'image_tag_2', 'image_tag_3', 'image_tag_4', 'image_tag_5',)
 
     def make_published(self, request, queryset):
         rows_updated = queryset.update(confirmed_to_show=True)
@@ -49,9 +49,11 @@ class PostAdmin(admin.ModelAdmin):
                 Tag.objects.get_or_create(name=tag, post=obj)
             obj.save()
             value = value_of_feed(obj.sender.profile.score, obj.sender.profile.count_of_rates, 1)
+            # todo : bulk create it
             for user in obj.sender.follow.followers.all():
                 Feed.objects.create(user=user, post=obj, sort_value=value)
             Feed.objects.create(user=obj.sender, post=obj, sort_value=2147483647, buyable=False)
+            ProfilePost.objects.create(user=obj.sender, post=obj, is_repost=False)
         super(PostAdmin, self).save_model(request, obj, form, change)
 
 

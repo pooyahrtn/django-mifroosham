@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import F
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils import timezone
@@ -49,6 +50,7 @@ class Post(models.Model):
     reposters = models.ManyToManyField(to=User, blank=True, related_name='reposts')
     n_likes = models.IntegerField(default=0, editable=False)
     n_reposters = models.IntegerField(default=0, editable=False)
+    n_comments = models.IntegerField(default=0, editable=False)
     discount = models.OneToOneField(Discount, on_delete=models.CASCADE, blank=True, null=True)
     auction = models.OneToOneField(Auction, on_delete=models.CASCADE, blank=True, null=True)
     disable_after_buy = models.BooleanField(default=True)
@@ -91,12 +93,30 @@ class Post(models.Model):
         return mark_safe('<img src="/media/%s" width="150" height="150" />' % self.image_url_5)
 
 
+class CommentManager(models.Manager):
+    def add_comment(self, from_user, text, post):
+        Post.objects.filter(pk=post.pk).update(n_comments=F('n_comments') + 1)
+        return self.create(user=from_user, text=text, post=post)
+
+    def delete_comment(self, comment):
+        self.get(pk=comment.pk).delete()
+        Post.objects.filter(pk=comment.post.pk).update(n_comments=F('n_comments') - 1)
+
 
 class Comment(models.Model):
+    uuid = models.UUIDField(
+        db_index=True,
+        default=uuid_lib.uuid4,
+        editable=False)
     time = models.DateTimeField(auto_now_add=True, blank=True)
     text = models.CharField(max_length=400)
     user = models.ForeignKey(to=User, related_name='comments')
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE, related_name='comments')
+
+    objects = CommentManager()
+
+    class Meta:
+        ordering = ['pk',]
 
 
 class Suggest(models.Model):
@@ -106,9 +126,9 @@ class Suggest(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
 
-class FeedManager(models.Manager):
-    def read_feeds(self, feeds_uuids, user, viewing_version):
-        self.filter(uuid__in=feeds_uuids, user=user, read=False).update(read=True, sort_version=viewing_version)
+# class FeedManager(models.Manager):
+#     def read_feeds(self, feeds_uuids, user, viewing_version):
+#         self.filter(uuid__in=feeds_uuids, user=user, read=False).update(read=True, sort_version=viewing_version)
 
 
 class Feed(models.Model):
@@ -123,7 +143,7 @@ class Feed(models.Model):
     sort_value = models.IntegerField(default=0, db_index=True)
     read = models.BooleanField(default=False)
     buyable = models.BooleanField(default=True)
-    objects = FeedManager()
+    # objects = FeedManager()
 
     def __str__(self):
         return self.post.title
@@ -131,7 +151,15 @@ class Feed(models.Model):
     class Meta:
         ordering = ['read', '-sort_version', '-sort_value', '-pk']
 
-        #
-        # @receiver(post_save, sender=Post)
-        # def create_new_post(sender, instance, created, **kwargs):
-        #
+
+class ProfilePost(models.Model):
+    uuid = models.UUIDField(
+        db_index=True,
+        default=uuid_lib.uuid4,
+        editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    is_repost = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username + ' : ' + self.post.title

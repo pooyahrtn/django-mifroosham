@@ -31,6 +31,8 @@ class TransactionNotifications(generics.ListAPIView):
     def filter_queryset(self, queryset):
         return models.TransactionNotification.objects.filter(user=self.request.user)
 
+    class Meta:
+        ordering = ['-pk']
 
 class ReadTransactionNotifications(generics.DestroyAPIView):
     permissions = (permissions.permissions.IsAuthenticated,)
