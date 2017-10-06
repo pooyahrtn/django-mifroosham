@@ -115,6 +115,9 @@ class Comment(models.Model):
 
     objects = CommentManager()
 
+    def __str__(self):
+        return self.post.title
+
     class Meta:
         ordering = ['pk',]
 
@@ -163,3 +166,6 @@ class ProfilePost(models.Model):
 
     def __str__(self):
         return self.user.username + ' : ' + self.post.title
+
+    class Meta:
+        ordering = ['-pk']

@@ -311,7 +311,7 @@ class WriteReview(APIView):
                 trans.review = Review.objects.write_review(for_user=trans.post.sender, reviewer=trans.buyer,
                                                            rate=serializer.validated_data['rate'],
                                                            comment=serializer.validated_data['comment'],
-                                                            image_url = trans.post.image_url_0)
+                                                           image_url=trans.post.image_url_0)
                 trans.rate_status = Transaction.RATED
                 trans.save()
             else:

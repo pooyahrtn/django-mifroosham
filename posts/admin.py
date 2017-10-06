@@ -2,7 +2,7 @@ import re
 from django.contrib import admin
 
 from posts.utils import value_of_feed
-from .models import Post, Feed, Auction, Discount, ProfilePost
+from .models import Post, Feed, Auction, Discount, ProfilePost, Comment
 
 
 class ConfirmPostFilter(admin.SimpleListFilter):
@@ -68,5 +68,10 @@ class AuctionAdmin(admin.ModelAdmin):
 
 
 @admin.register(Discount)
+class DiscountAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Comment)
 class DiscountAdmin(admin.ModelAdmin):
     pass
