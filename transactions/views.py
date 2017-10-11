@@ -111,6 +111,9 @@ class InvestOnPost(APIView):
         post.save()
         QeroonTransaction.objects.create(suspended_qeroon=value, status=QeroonTransaction.REQUESTED, post=post,
                                          user=self.request.user)
+        # why the fuck cant I serializer QeroonTransaction?! fuck. fuccckkk.
+        # post_serializer = PostSerializer(post)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'rest_framework',
     'posts.apps.PostsConfig',
     'profiles.apps.ProfilesConfig',
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'notifications.apps.NotificationsConfig',
     'helps.apps.HelpsConfig',
+    'search.apps.SearchConfig',
 ]
 
 MIDDLEWARE = [

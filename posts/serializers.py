@@ -255,7 +255,30 @@ class SuggestSerializer(serializers.ModelSerializer):
 
 class ProfilePostSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)
+    you_liked = serializers.SerializerMethodField()
+    you_reposted = serializers.SerializerMethodField()
 
     class Meta:
         model = ProfilePost
-        fields = ('is_repost', 'post')
+        fields = ('is_repost', 'post', 'you_liked', 'you_reposted')
+
+    def get_you_liked(self, obj):
+        return obj.post.likes.filter(username=self.context['request'].user.username).exists()
+
+    def get_you_reposted(self, obj):
+        return obj.post.reposters.filter(username=self.context['request'].user.username).exists()
+
+
+class SearchPostSerializer(PostSerializer):
+    you_liked = serializers.SerializerMethodField()
+    you_reposted = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Post
+        fields = post_fields + ('you_liked', 'you_reposted')
+
+    def get_you_liked(self, obj):
+        return obj.likes.filter(username=self.context['request'].user.username).exists()
+
+    def get_you_reposted(self, obj):
+        return obj.reposters.filter(username=self.context['request'].user.username).exists()

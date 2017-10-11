@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^profiles/', include('profiles.urls'),name='profiles'),
     url(r'^transactions/', include('transactions.urls')),
     url(r'^notifications/', include('notifications.urls')),
+    url(r'^search/', include('search.urls')),
     url(r'^(?P<username>[a-z]+)/$', UserDetail.as_view()),
 
 ]

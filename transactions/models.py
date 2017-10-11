@@ -91,10 +91,10 @@ class QeroonTransaction(models.Model):
 
     suspended_qeroon = models.IntegerField()
     requested_time = models.DateTimeField(auto_now_add=True)
-    got_time = models.DateTimeField(null=True)
-    cancel_time = models.DateTimeField(null=True)
+    got_time = models.DateTimeField(null=True, blank=True)
+    cancel_time = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=REQUESTED)
-    post = models.ForeignKey(Post)
+    post = models.ForeignKey(Post, on_delete=models.PROTECT)
     # TODO: remove null= True
     user = models.ForeignKey(User, related_name='qeroon_transactions', null=True)
 

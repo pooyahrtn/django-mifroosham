@@ -60,16 +60,6 @@ class FeedList(generics.ListAPIView):
         return Response(serializer.data)
 
 
-# class ReadFeeds(APIView):
-#     permission_classes = (permissions.IsAuthenticated,)
-#
-#     def post(self, request, *args, **kwargs):
-#         serializer = FeedsUUIDSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         Feed.objects.read_feeds(serializer.validated_data['uuids'], self.request.user,
-#                                 serializer.validated_data['visiting_version'])
-#         return Response(serializer.validated_data, status.HTTP_200_OK)
-
 
 class LikePost(generics.UpdateAPIView):
     queryset = Post.objects.all()

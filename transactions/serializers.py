@@ -46,9 +46,25 @@ class WriteReviewSerializer(GetTransactionSerializer):
     comment = serializers.CharField(max_length=400, allow_null=True, allow_blank=True)
 
 
+class QeroonTransactionsSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(read_only=True)
+    suspended_qeroon = serializers.IntegerField(read_only=True)
+    requested_time = serializers.DateTimeField(read_only=True)
+    got_time = serializers.DateTimeField(read_only=True)
+    cancel_time = serializers.DateTimeField(read_only=True)
+    post = PostSerializer(read_only=True)
+    uuid = serializers.UUIDField(read_only=True)
+
+    class Meta:
+        model = QeroonTransaction
+        fields = ('status', 'suspended_qeroon', 'requested_time', 'got_time', 'cancel_time', 'post', 'uuid')
+
+
 class InvestOnPostSerializer(serializers.Serializer):
     post_uuid = serializers.UUIDField(label="post_uuid")
     value = serializers.IntegerField()
+    # qeroon_transaction = QeroonTransactionsSerializer(read_only=True)
+
 
 
 transaction_base_fields = ('post', 'status', 'buyer', 'suspended_money', 'deliver_time', 'cancel_time',
@@ -85,19 +101,6 @@ class AuctionSuggestSerializer(BuyTransactionSerializer):
     #     attrs = super().validate(attrs)
     #     higher_suggest = attrs.get()
 
-
-class QeroonTransactionsSerializer(serializers.ModelSerializer):
-    status = serializers.ReadOnlyField()
-    suspended_qeroon = serializers.ReadOnlyField()
-    requested_time = serializers.ReadOnlyField()
-    got_time = serializers.ReadOnlyField()
-    cancel_time = serializers.ReadOnlyField()
-    post = PostSerializer(read_only=True)
-    uuid = serializers.ReadOnlyField()
-
-    class Meta:
-        model = QeroonTransaction
-        fields = ('status', 'suspended_qeroon', 'requested_time', 'got_time', 'cancel_time', 'post', 'uuid')
 
 
 class ReturnInvestSerializer(serializers.Serializer):
