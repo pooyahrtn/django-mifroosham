@@ -1,13 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.db.models import F
-from django.dispatch import receiver
-from django.db.models.signals import post_save
-from django.utils import timezone
 import uuid as uuid_lib
-import re
 from django.utils.safestring import mark_safe
-from django.core.validators import MinValueValidator
+from django.conf import settings
 
 
 class Discount(models.Model):
@@ -32,7 +27,7 @@ class Post(models.Model):
         db_index=True,
         default=uuid_lib.uuid4,
         editable=False)
-    sender = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='posts')
+    sender = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts')
     sent_time = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100)
     price = models.BigIntegerField(blank=True, null=True)
@@ -46,8 +41,8 @@ class Post(models.Model):
     image_url_5 = models.ImageField(null=True, blank=True)
     image_count = models.SmallIntegerField(default=1)
     description = models.CharField(max_length=600, blank=True)
-    likes = models.ManyToManyField(to=User, blank=True, related_name='likes')
-    reposters = models.ManyToManyField(to=User, blank=True, related_name='reposts')
+    likes = models.ManyToManyField(to=settings.AUTH_USER_MODEL, blank=True, related_name='likes')
+    reposters = models.ManyToManyField(to=settings.AUTH_USER_MODEL, blank=True, related_name='reposts')
     n_likes = models.IntegerField(default=0, editable=False)
     n_reposters = models.IntegerField(default=0, editable=False)
     n_comments = models.IntegerField(default=0, editable=False)
@@ -110,7 +105,7 @@ class Comment(models.Model):
         editable=False)
     time = models.DateTimeField(auto_now_add=True, blank=True)
     text = models.CharField(max_length=400)
-    user = models.ForeignKey(to=User, related_name='comments')
+    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='comments')
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE, related_name='comments')
 
     objects = CommentManager()
@@ -124,8 +119,8 @@ class Comment(models.Model):
 
 class Suggest(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='suggests')
-    suggester = models.ForeignKey(User, related_name='suggests')
-    suggest_to = models.ForeignKey(User, related_name='suggesteds')
+    suggester = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='suggests')
+    suggest_to = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='suggesteds')
     time = models.DateTimeField(auto_now_add=True)
 
 
@@ -139,9 +134,9 @@ class Feed(models.Model):
         db_index=True,
         default=uuid_lib.uuid4,
         editable=False)
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
-    reposter = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True, related_name='repost_posts')
+    reposter = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True, related_name='repost_posts')
     sort_version = models.IntegerField(default=0, blank=True, db_index=True)
     sort_value = models.IntegerField(default=0, db_index=True)
     read = models.BooleanField(default=False)
@@ -160,7 +155,7 @@ class ProfilePost(models.Model):
         db_index=True,
         default=uuid_lib.uuid4,
         editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     is_repost = models.BooleanField(default=False)
 

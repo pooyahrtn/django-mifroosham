@@ -6,8 +6,6 @@ from . import permissions
 from . import models
 from . import serializers
 from rest_framework.response import Response
-import requests
-import json
 
 
 class MyNotificationToken(generics.CreateAPIView):

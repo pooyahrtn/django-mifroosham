@@ -14,6 +14,7 @@ from .tasks import send_sms
 from .exceptions import *
 from .permissions import *
 import datetime
+from notifications.models import FollowNotification
 
 
 def change_follower_feed(follower, who_followed, is_followed):
@@ -47,6 +48,7 @@ class FollowUser(generics.UpdateAPIView):
             user.follow.followers.add(self.request.user)
             user.follow.n_followers += 1
             self.request.user.follow.n_followings += 1
+            FollowNotification.objects.create_notification(self.request.user, user)
         change_follower_feed(follower=self.request.user, who_followed=user, is_followed=not following)
         self.request.user.follow.save()
         user.follow.save()
@@ -64,28 +66,29 @@ class UserDetail(generics.RetrieveAPIView):
         serializer = self.get_serializer(instance)
         data = serializer.data
         if not self.request.user.is_anonymous:
-            data['you_follow'] = self.request.user.followings.filter(user=self.get_object()).exists()
             if instance.pk == self.request.user.pk:
-                data['money'] = instance.profile.money
+                data['money'] = instance.money
+            else:
+                data['you_follow'] = self.request.user.followings.filter(user=self.get_object()).exists()
         return Response(data)
 
 
 class MyProfile(generics.RetrieveUpdateAPIView):
-    queryset = Profile.objects.all()
+    queryset = User.objects.all()
     serializer_class = MyProfileSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOfProfile)
 
     def get_object(self):
-        return Profile.objects.get(user=self.request.user)
+        return self.request.user
 
 
 class UpdateProfilePhoto(generics.UpdateAPIView):
-    queryset = Profile.objects.all()
+    queryset = User.objects.all()
     serializer_class = UpdateProfilePhotoSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOfProfile)
 
     def get_object(self):
-        return Profile.objects.get(user=self.request.user)
+        return self.request.user
 
 
 class SignUp(generics.CreateAPIView):
@@ -115,8 +118,8 @@ class RequestConfirmation(APIView):
         user = serializer.validated_data['user']
         code = random.randint(100000, 999999)
 
-        phone_confirmation = user.phone_confirmation
-        if phone_confirmation:
+        phone_confirmation, created = PhoneNumberConfirmation.objects.get_or_create(user=user)
+        if not created:
             now = datetime.datetime.now(datetime.timezone.utc)
             delta_time = now - phone_confirmation.last_request_time
             if delta_time < datetime.timedelta(minutes=1):
@@ -125,7 +128,9 @@ class RequestConfirmation(APIView):
             phone_confirmation.last_request_time = now
             phone_confirmation.save()
         else:
-            PhoneNumberConfirmation.objects.create(user=user, confirm_code=code)
+            phone_confirmation.confirm_code = code
+            phone_confirmation.save()
+
         send_sms.delay(user.phone_number.number, code)
 
         return Response({'sent': True})
@@ -146,14 +151,6 @@ class Login(APIView):
         return Response({'token': token.key})
 
 
-class IncreaseViewingApp(APIView):
-    def post(self, request, *args, **kwargs):
-        profile = Profile.objects.get(user=self.request.user)
-        profile.count_visiting_app = F('count_visiting_app') + 1
-        profile.save()
-        return Response(data=profile.count_visiting_app, status=status.HTTP_200_OK)
-
-
 class UserReviews(generics.ListAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
@@ -162,3 +159,24 @@ class UserReviews(generics.ListAPIView):
     def filter_queryset(self, queryset):
         user = get_object_or_404(User, username=self.kwargs['username'])
         return Review.objects.filter(for_user=user)
+
+
+class UserFollowers(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'username'
+
+    def get_queryset(self):
+        return get_object_or_404(User, username=self.kwargs['username']).follow.followers.all()
+
+
+class UserFollowings(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'username'
+
+    def get_queryset(self):
+        # it does not look like good. not at all.
+        user_follows = get_object_or_404(User, username=self.kwargs['username']).followings.values_list('user',
+                                                                                                        flat=True)
+        return User.objects.filter(id__in=user_follows).all()

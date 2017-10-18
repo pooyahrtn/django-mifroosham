@@ -2,12 +2,226 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d5c068eb-7b5e-4d13-9db9-5966c20b4875" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/search/urls.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_27LEb42.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_3jSN2v9.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_41h6GSA.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_4KCXWpy.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_6hhPZEI.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_EBYsLkR.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_ErwvBaj.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_LE3IPee.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_OR9VZqO.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_f67mO8V.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_scaled.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_w4SyYca.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-09_21-37-16_png_wQ4flL3.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-10_22-20-18_66ik7oA.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-10_22-20-18_edited.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/Screenshot_from_2017-03-10_22-20-18_l83WDOw.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/TurDad_EN-US11284438848_1920x1080.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/TurDad_EN-US11284438848_1920x1080_GGoPQdP.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/TurDad_EN-US11284438848_1920x1080_L0q7oib.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/TurDad_EN-US11284438848_1920x1080_OwbFip3.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/UES2PnGjiCU.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/UES2PnGjiCU_CY1ZnRi.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/UES2PnGjiCU_DTFI3L4.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/UES2PnGjiCU_J2Oawkn.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/UES2PnGjiCU_YsCDL6c.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/UES2PnGjiCU_cwds93q.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/UES2PnGjiCU_hqXn30d.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/UES2PnGjiCU_kilcpcZ.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/V7ZLzhBbY0o.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/V7ZLzhBbY0o_Lsykn2j.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/V7ZLzhBbY0o_MZiSCOj.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/V7ZLzhBbY0o_MyCFlKL.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/V7ZLzhBbY0o_RW4b9Ea.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/V7ZLzhBbY0o_TgWYR8E.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars_9HPL5y8.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars_AuAsHWD.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars_FLsIeC7.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars_VRLjGDx.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars_WVOJqkB.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars_guWpaPk.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars_kmuTG1N.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars_mAfW9YB.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/milky-way-mountains-sky-mystery-winter-snow-stars_p0UCbsn.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/passion_flower_by_Irene_Gr.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/passion_flower_by_Irene_Gr_4xM9NKG.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/petukh-ptitsa-peria-greben-sergi.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/petukh-ptitsa-peria-greben-sergi_EDsKUgy.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/petukh-ptitsa-peria-greben-sergi_g7Iv0w4.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_04ja0iK.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_3wIDvKS.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_7Iim6dw.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_7Iim6dw_QMqBpf1.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_7scDcT9.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_8d0SEVC.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_8d0SEVC_jI9Icgi.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_9A9oB0U.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_9A9oB0U_WvKmesS.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_9oMYRCt.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_9oMYRCt_WHpw4D1.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_CGEsFzy.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_CM6K0me.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_CNHJDgV.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_CykLego.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_FupXF89.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_FupXF89_OZuUbyr.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_FupXF89_OZuUbyr_f1fjEbp.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_G9MoWgN.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_Gg3GajV.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_Gg3GajV_C9jnLAE.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_Gy3tGsR.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_JDlxqRt.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_JG4Hz4H.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_Kbnb1sZ.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_Kbnb1sZ_8VkMyVs.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_KvVWZzu.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_L24ON2f.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_LMcC1c8.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_LMcC1c8_3WBK0IV.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_Md0qfwl.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_NGHTcWL.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_NJ4Guot.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_NdJkFxS.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_NdJkFxS_jJZUyVg.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_NeSrhY6.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_R0MYt7k.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_RISCySG.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_RNG9xAr.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_RNG9xAr_pPqLhLe.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_RNG9xAr_pPqLhLe_3cJPK6J.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_SG9Gut1.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_ScYSEft.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_ScYSEft_e2YT3dv.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_ScfW9uK.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_TPhfzIr.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_TZWQqoW.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_TnWvQ8Y.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_UR5It7P.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_UZ9PUQV.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_WOPmfHY.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_XJG6923.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_XdFZ2tN.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_YTQuyq6.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_YTQuyq6_mh2T7jK.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_anxmUSd.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_anxmUSd_Bj9qZau.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_cHXZwdj.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_cIUGenr.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_cTo0yOU.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_dtaH4wY.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_ecSmtiQ.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_esq25Y1.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_hPWEV32.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_joZCKte.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_kDEB4Wi.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_n1f4F2C.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_ok2Ptcw.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_oxDX00a.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_oxDX00a_G1mi7ej.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_pEquxHz.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_tfxe4o3.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_uquKk6u.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_vKa4Nn6.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_vQsfU7y.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_vQsfU7y_B2rDJi7.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_wVwOtrY.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_wuTTlHV.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_xlEks7R.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_xygNf9g.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/media/profile_zYHXvrf.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/notifications/migrations/0002_auto_20170828_0847.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/notifications/migrations/0003_auto_20170828_0919.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/notifications/migrations/0004_auto_20170929_1508.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0002_feed_uuid.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0003_post_uuid.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0004_post_confirmed_to_show.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0005_post_waiting_to_confirm.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0006_auto_20170902_1321.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0007_remove_post_tags.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0008_auto_20170903_1143.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0009_auto_20170903_1155.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0010_delete_feedmanager.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0011_auto_20170903_1431.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0012_auto_20170903_1509.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0013_auto_20170904_1320.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0014_feed_buyable.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0015_auto_20170907_1134.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0016_auto_20170909_1341.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0017_auto_20170909_1347.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0018_post_ads_included.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0019_post_total_invested_qeroons.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0020_auto_20170911_1249.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0021_auto_20170915_1256.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0022_post_location.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0023_post_next_buy_ben.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0024_auto_20170918_1524.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0025_auto_20170927_0912.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0026_auto_20170930_1407.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0027_auto_20171003_1359.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0028_profilepost.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/posts/migrations/0029_auto_20171006_1353.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0002_phonenumber_phonenumberconfirmation.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0003_auto_20170824_1049.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0004_auto_20170824_1526.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0005_auto_20170826_1404.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0006_profile_score.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0007_profile_count_of_rates.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0008_auto_20170903_1155.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0009_auto_20170903_1422.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0010_profile_qeroon.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0011_review.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0012_review_uuid.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0013_remove_review_uuid.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0014_review_uuid.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/profiles/migrations/0015_review_image_url.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/reports/migrations/0002_reportcomment.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/reports/migrations/0003_reportcomment_reporter.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/reports/migrations/0004_reportcomment_delete_comment.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/tags/migrations/0002_tag_post.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0002_transaction_feed.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0003_auto_20170824_1520.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0004_transaction_uuid.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0005_auto_20170825_0907.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0006_qeroontransaction.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0007_qeroontransaction_user.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0008_auto_20170909_1421.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0009_auto_20170909_1532.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0010_auto_20170910_1157.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0011_auto_20170911_0922.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0012_auto_20170911_1249.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0013_auto_20170915_1256.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0014_auto_20170923_1247.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0015_transaction_auction_failed.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/transactions/migrations/0016_auto_20171009_1608.py" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/media/profile.jpg" afterPath="$PROJECT_DIR$/media/profile.jpg" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mifroosham/settings.py" afterPath="$PROJECT_DIR$/mifroosham/settings.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mifroosham/urls.py" afterPath="$PROJECT_DIR$/mifroosham/urls.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/migrations/0001_initial.py" afterPath="$PROJECT_DIR$/notifications/migrations/0001_initial.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/models.py" afterPath="$PROJECT_DIR$/notifications/models.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/tasks.py" afterPath="$PROJECT_DIR$/notifications/tasks.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/views.py" afterPath="$PROJECT_DIR$/notifications/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/posts/admin.py" afterPath="$PROJECT_DIR$/posts/admin.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/posts/migrations/0001_initial.py" afterPath="$PROJECT_DIR$/posts/migrations/0001_initial.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/posts/models.py" afterPath="$PROJECT_DIR$/posts/models.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/posts/serializers.py" afterPath="$PROJECT_DIR$/posts/serializers.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/posts/views.py" afterPath="$PROJECT_DIR$/posts/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/admin.py" afterPath="$PROJECT_DIR$/profiles/admin.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/migrations/0001_initial.py" afterPath="$PROJECT_DIR$/profiles/migrations/0001_initial.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/models.py" afterPath="$PROJECT_DIR$/profiles/models.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/permissions.py" afterPath="$PROJECT_DIR$/profiles/permissions.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/serializers.py" afterPath="$PROJECT_DIR$/profiles/serializers.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/urls.py" afterPath="$PROJECT_DIR$/profiles/urls.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/views.py" afterPath="$PROJECT_DIR$/profiles/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/reports/migrations/0001_initial.py" afterPath="$PROJECT_DIR$/reports/migrations/0001_initial.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/reports/models.py" afterPath="$PROJECT_DIR$/reports/models.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/search/views.py" afterPath="$PROJECT_DIR$/search/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tags/migrations/0001_initial.py" afterPath="$PROJECT_DIR$/tags/migrations/0001_initial.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transactions/migrations/0001_initial.py" afterPath="$PROJECT_DIR$/transactions/migrations/0001_initial.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transactions/models.py" afterPath="$PROJECT_DIR$/transactions/models.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transactions/serializers.py" afterPath="$PROJECT_DIR$/transactions/serializers.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transactions/views.py" afterPath="$PROJECT_DIR$/transactions/views.py" />
@@ -25,96 +239,43 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/transactions/views.py">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/profiles/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="116" column="34" lean-forward="false" selection-start-line="116" selection-start-column="34" selection-end-line="116" selection-end-column="34" />
+            <state relative-caret-position="526">
+              <caret line="182" column="0" lean-forward="true" selection-start-line="182" selection-start-column="0" selection-end-line="182" selection-end-column="0" />
               <folding>
-                <element signature="e#886#1233#0" expanded="false" />
-                <element signature="e#1264#3982#0" expanded="false" />
-                <element signature="e#1443#3982#0" expanded="false" />
-                <element signature="e#2351#2593#0" expanded="false" />
-                <element signature="e#2534#2593#0" expanded="false" />
-                <element signature="e#2663#3009#0" expanded="false" />
-                <element signature="e#2950#3009#0" expanded="false" />
-                <element signature="e#6287#6422#0" expanded="false" />
-                <element signature="e#7004#8761#0" expanded="false" />
-                <element signature="e#7187#8758#0" expanded="false" />
-                <element signature="e#7786#7960#0" expanded="false" />
-                <element signature="e#8009#8226#0" expanded="false" />
-                <element signature="e#8634#8690#0" expanded="false" />
-                <element signature="e#8821#9966#0" expanded="false" />
-                <element signature="e#9007#9966#0" expanded="false" />
-                <element signature="e#10007#11068#0" expanded="false" />
-                <element signature="e#10186#11068#0" expanded="false" />
-                <element signature="e#10724#10955#0" expanded="false" />
-                <element signature="e#12110#12245#0" expanded="false" />
-                <element signature="e#12840#13215#0" expanded="false" />
-                <element signature="e#13664#15301#0" expanded="false" />
-                <element signature="e#13840#15301#0" expanded="false" />
-                <element signature="e#14301#14599#0" expanded="false" />
-                <element signature="e#14626#15232#0" expanded="false" />
-                <element signature="e#14657#15129#0" expanded="false" />
-                <element signature="e#15358#15672#0" expanded="false" />
-                <element signature="e#15406#15672#0" expanded="false" />
-                <element signature="e#15434#15670#0" expanded="false" />
-                <element signature="e#15727#16589#0" expanded="false" />
-                <element signature="e#15966#16048#0" expanded="false" />
-                <element signature="e#16104#16589#0" expanded="false" />
-                <element signature="e#16372#16485#0" expanded="false" />
-                <element signature="e#16642#17527#0" expanded="false" />
-                <element signature="e#16874#16986#0" expanded="false" />
-                <element signature="e#17042#17527#0" expanded="false" />
-                <element signature="e#17310#17423#0" expanded="false" />
-                <element signature="e#17573#17837#0" expanded="false" />
-                <element signature="e#17774#17837#0" expanded="false" />
-                <element signature="e#17873#18786#0" expanded="false" />
-                <element signature="e#18050#18786#0" expanded="false" />
-                <element signature="e#18821#19140#0" expanded="false" />
-                <element signature="e#18927#19140#0" expanded="false" />
+                <element signature="e#0#13#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="serializers.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/transactions/serializers.py">
+        <entry file="file://$PROJECT_DIR$/profiles/serializers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="334">
-              <caret line="64" column="37" lean-forward="false" selection-start-line="64" selection-start-column="37" selection-end-line="64" selection-end-column="37" />
+            <state relative-caret-position="226">
+              <caret line="145" column="80" lean-forward="true" selection-start-line="145" selection-start-column="80" selection-end-line="145" selection-end-column="80" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="serializers.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/posts/serializers.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="151">
-              <caret line="261" column="24" lean-forward="true" selection-start-line="261" selection-start-column="24" selection-end-line="261" selection-end-column="24" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/search/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="22" column="32" lean-forward="true" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
-              <folding>
-                <element signature="e#0#35#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/transactions/models.py">
+        <entry file="file://$PROJECT_DIR$/profiles/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1065">
-              <caret line="77" column="6" lean-forward="false" selection-start-line="77" selection-start-column="6" selection-end-line="77" selection-end-column="6" />
+            <state relative-caret-position="270">
+              <caret line="26" column="16" lean-forward="false" selection-start-line="26" selection-start-column="16" selection-end-line="26" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/profiles/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="10" column="62" lean-forward="false" selection-start-line="10" selection-start-column="62" selection-end-line="10" selection-end-column="62" />
               <folding />
             </state>
           </provider>
@@ -132,14 +293,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>from rest_framework.views import APIView</find>
-      <find>Response</find>
-      <find>sendposts</find>
-      <find>feedser</find>
-      <find>image_url</find>
-      <find>reposter</find>
-      <find>buy</find>
-      <find>postdef</find>
       <find>deleted_</find>
       <find>buyab</find>
       <find>buya</find>
@@ -160,8 +313,16 @@
       <find>Transactiopos</find>
       <find>comment</find>
       <find>qeroon</find>
-      <find>create</find>
       <find>create(</find>
+      <find>user</find>
+      <find>User</find>
+      <find>deliver</find>
+      <find>follow</find>
+      <find>profile</find>
+      <find>create</find>
+      <find>profile.</find>
+      <find>sender_ty</find>
+      <find>Profile</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$</dir>
@@ -173,8 +334,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/helps/templates/helps/can_change_post.md" />
-        <option value="$PROJECT_DIR$/helps/templates/helps/buy_charity.md" />
         <option value="$PROJECT_DIR$/helps/templates/helps/qeroons.md" />
         <option value="$PROJECT_DIR$/helps/templates/helps/buy_phone_number.md" />
         <option value="$PROJECT_DIR$/helps/templates/helps/buy_confirm_code.md" />
@@ -197,41 +356,43 @@
         <option value="$PROJECT_DIR$/transactions/urls.py" />
         <option value="$PROJECT_DIR$/helps/templates/helps/sendpost/disable_after_buy.md" />
         <option value="$PROJECT_DIR$/helps/templates/helps/send_post_helps.json" />
-        <option value="$PROJECT_DIR$/notifications/tasks.py" />
-        <option value="$PROJECT_DIR$/notifications/models.py" />
         <option value="$PROJECT_DIR$/notifications/serializers.py" />
         <option value="$PROJECT_DIR$/notifications/urls.py" />
-        <option value="$PROJECT_DIR$/notifications/views.py" />
         <option value="$PROJECT_DIR$/reports/urls.py" />
         <option value="$PROJECT_DIR$/reports/views.py" />
         <option value="$PROJECT_DIR$/reports/exceptions.py" />
         <option value="$PROJECT_DIR$/reports/serializers.py" />
         <option value="$PROJECT_DIR$/reports/admin.py" />
-        <option value="$PROJECT_DIR$/reports/models.py" />
         <option value="$PROJECT_DIR$/posts/urls.py" />
-        <option value="$PROJECT_DIR$/profiles/urls.py" />
-        <option value="$PROJECT_DIR$/profiles/views.py" />
-        <option value="$PROJECT_DIR$/profiles/models.py" />
-        <option value="$PROJECT_DIR$/profiles/serializers.py" />
-        <option value="$PROJECT_DIR$/posts/admin.py" />
-        <option value="$PROJECT_DIR$/posts/models.py" />
         <option value="$PROJECT_DIR$/mifroosham/urls.py" />
-        <option value="$PROJECT_DIR$/mifroosham/settings.py" />
         <option value="$PROJECT_DIR$/search/urls.py" />
-        <option value="$PROJECT_DIR$/posts/views.py" />
-        <option value="$PROJECT_DIR$/transactions/models.py" />
+        <option value="$PROJECT_DIR$/notifications/tasks.py" />
+        <option value="$PROJECT_DIR$/mifroosham/settings.py" />
+        <option value="$PROJECT_DIR$/profiles/permissions.py" />
+        <option value="$PROJECT_DIR$/notifications/views.py" />
         <option value="$PROJECT_DIR$/transactions/views.py" />
         <option value="$PROJECT_DIR$/transactions/serializers.py" />
         <option value="$PROJECT_DIR$/search/views.py" />
+        <option value="$PROJECT_DIR$/posts/models.py" />
+        <option value="$PROJECT_DIR$/reports/models.py" />
+        <option value="$PROJECT_DIR$/transactions/models.py" />
+        <option value="$PROJECT_DIR$/profiles/admin.py" />
+        <option value="$PROJECT_DIR$/posts/admin.py" />
+        <option value="$PROJECT_DIR$/profiles/models.py" />
+        <option value="$PROJECT_DIR$/profiles/serializers.py" />
         <option value="$PROJECT_DIR$/posts/serializers.py" />
+        <option value="$PROJECT_DIR$/posts/views.py" />
+        <option value="$PROJECT_DIR$/notifications/models.py" />
+        <option value="$PROJECT_DIR$/profiles/urls.py" />
+        <option value="$PROJECT_DIR$/profiles/views.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="141" />
-    <option name="y" value="122" />
-    <option name="width" value="1281" />
-    <option name="height" value="576" />
+    <option name="x" value="87" />
+    <option name="y" value="14" />
+    <option name="width" value="1279" />
+    <option name="height" value="568" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -248,7 +409,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -259,27 +419,13 @@
             <path>
               <item name="mifroosham" type="b2602c69:ProjectViewProjectNode" />
               <item name="mifroosham" type="462c0819:PsiDirectoryNode" />
-              <item name="mifroosham" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="mifroosham" type="b2602c69:ProjectViewProjectNode" />
-              <item name="mifroosham" type="462c0819:PsiDirectoryNode" />
-              <item name="posts" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="mifroosham" type="b2602c69:ProjectViewProjectNode" />
-              <item name="mifroosham" type="462c0819:PsiDirectoryNode" />
-              <item name="search" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="mifroosham" type="b2602c69:ProjectViewProjectNode" />
-              <item name="mifroosham" type="462c0819:PsiDirectoryNode" />
-              <item name="transactions" type="462c0819:PsiDirectoryNode" />
+              <item name="profiles" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -560,38 +706,11 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="2" />
+      <option name="time" value="4" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/helps/templates/helps/buy_post_helps.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="1" lean-forward="false" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/helps/templates/helps/transactions/cancel_sell_alert.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/helps/templates/helps/transactions/cancel_sell_auction_alert.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="55" lean-forward="false" selection-start-line="0" selection-start-column="55" selection-end-line="0" selection-end-column="55" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/helps/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -630,13 +749,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/notifications/tasks.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="45" column="22" lean-forward="false" selection-start-line="45" selection-start-column="22" selection-end-line="45" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/notifications/serializers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
@@ -662,20 +774,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
           <caret line="20" column="52" lean-forward="false" selection-start-line="20" selection-start-column="52" selection-end-line="20" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/notifications/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="18" column="6" lean-forward="false" selection-start-line="18" selection-start-column="6" selection-end-line="18" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/notifications/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="301">
-          <caret line="34" column="24" lean-forward="false" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
         </state>
       </provider>
     </entry>
@@ -721,13 +819,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/reports/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="47" column="13" lean-forward="false" selection-start-line="47" selection-start-column="13" selection-end-line="47" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/reports/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -749,13 +840,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/posts/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="16" column="17" lean-forward="false" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharmCE2017.2/system/python_stubs/1446812144/posix.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="203">
@@ -770,13 +854,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="413">
-          <caret line="87" column="56" lean-forward="false" selection-start-line="87" selection-start-column="56" selection-end-line="87" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Env/mifroosham/lib/python3.5/site-packages/django/utils/six.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="203">
@@ -788,41 +865,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4350">
           <caret line="305" column="60" lean-forward="false" selection-start-line="305" selection-start-column="60" selection-end-line="305" selection-end-column="60" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/posts/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="71" lean-forward="false" selection-start-line="4" selection-start-column="71" selection-end-line="4" selection-end-column="71" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/serializers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="9" column="6" lean-forward="false" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mifroosham/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="20" column="45" lean-forward="true" selection-start-line="20" selection-start-column="45" selection-end-line="20" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="17" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -847,13 +889,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mifroosham/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="39" column="30" lean-forward="false" selection-start-line="39" selection-start-column="30" selection-end-line="39" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Env/mifroosham/lib/python3.5/site-packages/rest_framework/serializers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-4072">
@@ -869,69 +904,157 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/posts/models.py">
+    <entry file="file://$PROJECT_DIR$/notifications/tasks.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="118" column="30" lean-forward="false" selection-start-line="118" selection-start-column="30" selection-end-line="118" selection-end-column="30" />
+        <state relative-caret-position="481">
+          <caret line="69" column="33" lean-forward="true" selection-start-line="69" selection-start-column="33" selection-end-line="69" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mifroosham/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="83" column="32" lean-forward="false" selection-start-line="83" selection-start-column="32" selection-end-line="83" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transactions/serializers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="20" lean-forward="false" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/notifications/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/reports/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="34" column="57" lean-forward="false" selection-start-line="34" selection-start-column="57" selection-end-line="34" selection-end-column="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/search/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/transactions/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1065">
-          <caret line="77" column="6" lean-forward="false" selection-start-line="77" selection-start-column="6" selection-end-line="77" selection-end-column="6" />
-          <folding />
+        <state relative-caret-position="136">
+          <caret line="68" column="25" lean-forward="false" selection-start-line="68" selection-start-column="25" selection-end-line="68" selection-end-column="25" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/transactions/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="116" column="34" lean-forward="false" selection-start-line="116" selection-start-column="34" selection-end-line="116" selection-end-column="34" />
+        <state relative-caret-position="411">
+          <caret line="177" column="48" lean-forward="true" selection-start-line="177" selection-start-column="48" selection-end-line="177" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profiles/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/posts/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="55" column="19" lean-forward="false" selection-start-line="55" selection-start-column="12" selection-end-line="55" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profiles/permissions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="26" column="34" lean-forward="false" selection-start-line="26" selection-start-column="34" selection-end-line="26" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/posts/serializers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-990">
+          <caret line="12" column="30" lean-forward="false" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mifroosham/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="21" column="41" lean-forward="true" selection-start-line="21" selection-start-column="41" selection-end-line="21" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/posts/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1812">
+          <caret line="157" column="53" lean-forward="false" selection-start-line="157" selection-start-column="53" selection-end-line="157" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/search/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="32" lean-forward="true" selection-start-line="11" selection-start-column="32" selection-end-line="11" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/posts/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-675">
+          <caret line="133" column="9" lean-forward="false" selection-start-line="133" selection-start-column="9" selection-end-line="143" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/notifications/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="63" column="23" lean-forward="false" selection-start-line="63" selection-start-column="23" selection-end-line="63" selection-end-column="23" />
           <folding>
-            <element signature="e#886#1233#0" expanded="false" />
-            <element signature="e#1264#3982#0" expanded="false" />
-            <element signature="e#1443#3982#0" expanded="false" />
-            <element signature="e#2351#2593#0" expanded="false" />
-            <element signature="e#2534#2593#0" expanded="false" />
-            <element signature="e#2663#3009#0" expanded="false" />
-            <element signature="e#2950#3009#0" expanded="false" />
-            <element signature="e#6287#6422#0" expanded="false" />
-            <element signature="e#7004#8761#0" expanded="false" />
-            <element signature="e#7187#8758#0" expanded="false" />
-            <element signature="e#7786#7960#0" expanded="false" />
-            <element signature="e#8009#8226#0" expanded="false" />
-            <element signature="e#8634#8690#0" expanded="false" />
-            <element signature="e#8821#9966#0" expanded="false" />
-            <element signature="e#9007#9966#0" expanded="false" />
-            <element signature="e#10007#11068#0" expanded="false" />
-            <element signature="e#10186#11068#0" expanded="false" />
-            <element signature="e#10724#10955#0" expanded="false" />
-            <element signature="e#12110#12245#0" expanded="false" />
-            <element signature="e#12840#13215#0" expanded="false" />
-            <element signature="e#13664#15301#0" expanded="false" />
-            <element signature="e#13840#15301#0" expanded="false" />
-            <element signature="e#14301#14599#0" expanded="false" />
-            <element signature="e#14626#15232#0" expanded="false" />
-            <element signature="e#14657#15129#0" expanded="false" />
-            <element signature="e#15358#15672#0" expanded="false" />
-            <element signature="e#15406#15672#0" expanded="false" />
-            <element signature="e#15434#15670#0" expanded="false" />
-            <element signature="e#15727#16589#0" expanded="false" />
-            <element signature="e#15966#16048#0" expanded="false" />
-            <element signature="e#16104#16589#0" expanded="false" />
-            <element signature="e#16372#16485#0" expanded="false" />
-            <element signature="e#16642#17527#0" expanded="false" />
-            <element signature="e#16874#16986#0" expanded="false" />
-            <element signature="e#17042#17527#0" expanded="false" />
-            <element signature="e#17310#17423#0" expanded="false" />
-            <element signature="e#17573#17837#0" expanded="false" />
-            <element signature="e#17774#17837#0" expanded="false" />
-            <element signature="e#17873#18786#0" expanded="false" />
-            <element signature="e#18050#18786#0" expanded="false" />
-            <element signature="e#18821#19140#0" expanded="false" />
-            <element signature="e#18927#19140#0" expanded="false" />
+            <element signature="e#0#28#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/posts/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="15" column="52" lean-forward="false" selection-start-line="15" selection-start-column="52" selection-end-line="15" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profiles/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="10" column="62" lean-forward="false" selection-start-line="10" selection-start-column="62" selection-end-line="10" selection-end-column="62" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profiles/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="26" column="16" lean-forward="false" selection-start-line="26" selection-start-column="16" selection-end-line="26" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profiles/serializers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="145" column="80" lean-forward="true" selection-start-line="145" selection-start-column="80" selection-end-line="145" selection-end-column="80" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -945,43 +1068,19 @@
     </entry>
     <entry file="file://$USER_HOME$/Env/mifroosham/lib/python3.5/site-packages/rest_framework/generics.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="203">
-          <caret line="194" column="27" lean-forward="true" selection-start-line="194" selection-start-column="27" selection-end-line="194" selection-end-column="27" />
+        <state relative-caret-position="-690">
+          <caret line="104" column="34" lean-forward="true" selection-start-line="104" selection-start-column="34" selection-end-line="104" selection-end-column="34" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/search/views.py">
+    <entry file="file://$PROJECT_DIR$/profiles/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="32" lean-forward="true" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
+        <state relative-caret-position="526">
+          <caret line="182" column="0" lean-forward="true" selection-start-line="182" selection-start-column="0" selection-end-line="182" selection-end-column="0" />
           <folding>
-            <element signature="e#0#35#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/posts/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="421">
-          <caret line="219" column="25" lean-forward="false" selection-start-line="219" selection-start-column="25" selection-end-line="219" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/transactions/serializers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="334">
-          <caret line="64" column="37" lean-forward="false" selection-start-line="64" selection-start-column="37" selection-end-line="64" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/posts/serializers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="151">
-          <caret line="261" column="24" lean-forward="true" selection-start-line="261" selection-start-column="24" selection-end-line="261" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>

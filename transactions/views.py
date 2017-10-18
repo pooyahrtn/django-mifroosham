@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.template import loader
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
-from profiles.models import Profile, Review, PhoneNumber
+from profiles.models import Review, PhoneNumber
 from rest_framework import generics
 from django.db import transaction
 from posts.models import Auction, Discount
@@ -22,6 +22,7 @@ import datetime
 from notifications.models import TransactionNotification
 from .models import QeroonTransaction, qeroon_value
 import random
+from profiles.models import User
 
 
 def calculate_discount_current_price(discount):
@@ -33,6 +34,7 @@ def calculate_discount_current_price(discount):
     return int(discount.start_price + fraction * (discount.real_price - discount.start_price))
 
 
+# todo special care for this!
 class BuyPost(APIView):
     serializer_class = BuyTransactionSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -43,8 +45,7 @@ class BuyPost(APIView):
         serializer.is_valid(raise_exception=True)
         post = serializer.validated_data['post']
         reposter = serializer.validated_data['reposter']
-        me = self.request.user
-        my_profile = get_object_or_404(Profile.objects.select_for_update(), user_id=me.pk)
+        me = get_object_or_404(User.objects.select_for_update(), pk=self.request.user)
         if post.sender.username == me.username:
             return Response(data='dude you cant do in jib too oon jib', status=status.HTTP_403_FORBIDDEN)
         if post.disabled or not post.confirmed_to_show:
@@ -54,19 +55,19 @@ class BuyPost(APIView):
 
         if post.get_post_type() == Post.NORMAL_ITEM:
             price = post.price
-            if my_profile.money < price:
+            if me.money < price:
                 return Response(data='low money', status=status.HTTP_406_NOT_ACCEPTABLE)
             else:
-                my_profile.money -= price
-                my_profile.save()
+                me.money -= price
+                me.save()
         elif post.get_post_type() == Post.DISCOUNT_ITEM:
             discount = get_object_or_404(Discount, pk=post.discount.pk)
             price = calculate_discount_current_price(discount)
-            if my_profile.money < price:
+            if me.money < price:
                 return Response(data='low money', status=status.HTTP_406_NOT_ACCEPTABLE)
             else:
-                my_profile.money -= price
-                my_profile.save()
+                me.money -= price
+                me.save()
         else:
             return Response(data='not allowed', status=status.HTTP_405_METHOD_NOT_ALLOWED)
         post.disabled = post.disable_after_buy
@@ -97,15 +98,15 @@ class InvestOnPost(APIView):
         if post.disabled or not post.confirmed_to_show:
             return Response(data='this post is bought or disabled', status=status.HTTP_403_FORBIDDEN)
 
-        user_qeroons = self.request.user.profile.qeroon
+        user_qeroons = self.request.user.qeroon
         if user_qeroons < value:
             return Response('not enough qeroons to perform', status=status.HTTP_400_BAD_REQUEST)
         if post.remaining_qeroons < value:
             return Response('post qeroons are less than requested value', status.HTTP_410_GONE)
         if value < 1:
             return Response('value should more than 1', status=status.HTTP_400_BAD_REQUEST)
-        self.request.user.profile.qeroon = F('qeroon') - value
-        self.request.user.profile.save()
+        self.request.user.qeroon = F('qeroon') - value
+        self.request.user.save()
         post.remaining_qeroons = F('remaining_qeroons') - value
         post.total_invested_qeroons = F('total_invested_qeroons') + value
         post.save()
@@ -138,7 +139,7 @@ class CancelBuy(APIView):
         if trans.status == Transaction.CANCELED:
             raise AlreadyCanceled()
         self.request.user.profile.money += trans.suspended_money
-        Profile.objects.filter(user=trans.buyer).update(money=F('money') + trans.suspended_money)
+        User.objects.filter(pk=trans.buyer).update(money=F('money') + trans.suspended_money)
         trans.cancel_time = timezone.now()
         trans.rate_status = Transaction.CAN_RATE
         trans.save()
@@ -165,13 +166,13 @@ class DeliverItem(APIView):
 
         reposter = trans.reposter
         if reposter:
-            Profile.objects.filter(user_id=reposter.pk).update(total_successful_reposts=
+            User.objects.filter(pk=reposter.pk).update(total_successful_reposts=
                                                                F('total_successful_reposts') + 1)
         if trans.post.ads_included:
-            Profile.objects.filter(user=trans.post.sender).update(money=F('money') + trans.suspended_money * 0.9)
-            Profile.objects.filter(user=trans.buyer).update(qeroon=F('qeroon') + trans.post.total_invested_qeroons)
+            User.objects.filter(pk=trans.post.sender).update(money=F('money') + trans.suspended_money * 0.9)
+            User.objects.filter(pk=trans.buyer).update(qeroon=F('qeroon') + trans.post.total_invested_qeroons)
         else:
-            Profile.objects.filter(user=trans.post.sender).update(money=F('money') + trans.suspended_money)
+            User.objects.filter(pk=trans.post.sender).update(money=F('money') + trans.suspended_money)
         trans.status = Transaction.DELIVERED
         trans.deliver_time = timezone.now()
         trans.rate_status = Transaction.CAN_RATE
@@ -203,7 +204,7 @@ class CancelSell(APIView):
             Post.objects.filter(pk=trans.post.pk).update(disabled=True)
         else:
             Post.objects.filter(pk=trans.post.pk).update(disabled=False)
-        Profile.objects.filter(user_id=trans.buyer.pk).update(money=F('money') + trans.suspended_money)
+        User.objects.filter(pk=trans.buyer.pk).update(money=F('money') + trans.suspended_money)
         trans.status = Transaction.CANCELED
         trans.cancel_time = timezone.now()
         trans.save()
@@ -253,7 +254,7 @@ class AuctionSuggestHigher(APIView):
             return Response(data='this post is bought or disabled', status=status.HTTP_403_FORBIDDEN)
         higher_suggest = serializer.validated_data['higher_suggest']
         reposter = serializer.validated_data['reposter']
-        buyer_profile = get_object_or_404(Profile.objects.select_for_update(), user=self.request.user)
+        buyer_profile = get_object_or_404(User.objects.select_for_update(), pk=self.request.user)
         auction = get_object_or_404(Auction.objects.select_for_update(), pk=post.auction_id)
         if higher_suggest > buyer_profile.money:
             raise MoneyException()
@@ -277,7 +278,7 @@ class AuctionSuggestHigher(APIView):
             last_transaction.status = Transaction.CANCELED
             last_transaction.cancel_time = timezone.now()
             last_transaction.auction_failed = True
-            Profile.objects.filter(user_id=last_transaction.buyer.pk).update(money=F('money') + his_suspended_money)
+            User.objects.filter(pk=last_transaction.buyer.pk).update(money=F('money') + his_suspended_money)
             last_transaction.save()
 
         buyer_profile.save()
@@ -398,7 +399,7 @@ class ReturnInvest(APIView):
         q_transaction = get_object_or_404(QeroonTransaction, uuid=serializer.validated_data['transaction_uuid'])
         if q_transaction.user != self.request.user:
             raise NotAuthorized()
-        Profile.objects.filter(user=q_transaction.user).update(qeroon=F('qeroon') + q_transaction.suspended_qeroon)
+        User.objects.filter(pk=q_transaction.user).update(qeroon=F('qeroon') + q_transaction.suspended_qeroon)
         q_transaction.post.total_invested_qeroons = F('total_invested_qeroons') - q_transaction.suspended_qeroon
         q_transaction.post.remaining_qeroons = F('remaining_qeroons') + q_transaction.suspended_qeroon
         q_transaction.post.save()

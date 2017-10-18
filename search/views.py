@@ -1,7 +1,5 @@
 from django.shortcuts import render
-from profiles.models import User, Profile
-from django.db.models import Q, F
-from django.shortcuts import get_object_or_404
+from profiles.models import User
 from rest_framework import generics, parsers, renderers, status
 from django.contrib.postgres.search import TrigramSimilarity
 from profiles.serializers import UserSerializer
@@ -16,7 +14,7 @@ class FindUser(generics.ListAPIView):
     def get_queryset(self):
         return User.objects.annotate(
             similarity=TrigramSimilarity('username', self.kwargs['username']),
-        ).filter(similarity__gt=0.3).order_by('-similarity')
+        ).filter(similarity__gt=0.5).order_by('-similarity')
         # return User.objects.filter(username__search=self.kwargs['username'])
 
 

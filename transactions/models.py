@@ -1,10 +1,10 @@
 from django.db import models
 from django.db.models import F
 from posts.models import Post, Feed
-from django.contrib.auth.models import User
 import uuid as uuid_lib
 from profiles.models import Review
 from datetime import datetime
+from django.conf import settings
 
 qeroon_value = 100
 
@@ -35,7 +35,7 @@ class Transaction(models.Model):
         editable=False)
 
     post = models.ForeignKey(Post, on_delete=models.PROTECT)
-    buyer = models.ForeignKey(User, on_delete=models.PROTECT)
+    buyer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     status = models.CharField(
         max_length=2,
         choices=STATUS_CHOICES,
@@ -45,7 +45,7 @@ class Transaction(models.Model):
     time = models.DateTimeField(auto_now_add=True)
     deliver_time = models.DateTimeField(null=True, blank=True)
     cancel_time = models.DateTimeField(null=True, blank=True)
-    reposter = models.ForeignKey(to=User, null=True, blank=True, related_name='reposted_transaction')
+    reposter = models.ForeignKey(to=settings.AUTH_USER_MODEL, null=True, blank=True, related_name='reposted_transaction')
     confirm_code = models.IntegerField(default=0)
     rate_status = models.CharField(
         max_length=2,
@@ -68,11 +68,11 @@ class QeroonTransactionManager(models.Manager):
     def give_investors_money(self, post):
         # ITS FUCKING BAD
         for transaction in self.filter(post=post, status='re').all():
-            transaction.user.profile.money = F('money') + transaction.suspended_qeroon * 100
+            transaction.user.money = F('money') + transaction.suspended_qeroon * 100
             transaction.status = QeroonTransaction.GOT
             transaction.got_time = datetime.now()
             transaction.save()
-            transaction.user.profile.save()
+            transaction.user.save()
 
 
 class QeroonTransaction(models.Model):
@@ -96,7 +96,7 @@ class QeroonTransaction(models.Model):
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=REQUESTED)
     post = models.ForeignKey(Post, on_delete=models.PROTECT)
     # TODO: remove null= True
-    user = models.ForeignKey(User, related_name='qeroon_transactions', null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='qeroon_transactions', null=True)
 
     objects = QeroonTransactionManager()
 

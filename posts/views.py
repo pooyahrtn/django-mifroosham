@@ -3,14 +3,13 @@ from collections import OrderedDict
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from .models import Post, Feed, Comment, Suggest, ProfilePost
 from .serializers import *
 from rest_framework.response import Response
 from profiles.serializers import UserSerializer
-from django.contrib.auth.models import User
+from profiles.models import User
 from django.db import transaction
 from rest_framework import generics, status
-from django.utils import timezone
+from notifications.models import PostNotification
 from .permissions import *
 from .utils import value_of_feed
 from rest_framework.pagination import PageNumberPagination
@@ -39,12 +38,12 @@ class FeedList(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
-        version = self.request.user.profile.count_visiting_app
+        version = self.request.user.count_visiting_app
 
         if request.GET.get('page') is None:
-            self.request.user.profile.count_visiting_app += 1
+            self.request.user.count_visiting_app += 1
             version += 1
-            self.request.user.profile.save()
+            self.request.user.save()
         self.paginator.visit_version = version
         if page is not None:
             #todo: make it better
@@ -58,7 +57,6 @@ class FeedList(generics.ListAPIView):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
 
 
 class LikePost(generics.UpdateAPIView):
@@ -75,6 +73,7 @@ class LikePost(generics.UpdateAPIView):
         increment = 1
         if liked:
             post.likes.add(liker)
+            PostNotification.objects.create_notification(post, liker ,PostNotification.LIKE)
         else:
             post.likes.remove(liker)
             increment = -1
@@ -97,8 +96,8 @@ class Repost(generics.UpdateAPIView):
         increment = 1
         if reposted:
             post.reposters.add(reposter)
-            value = value_of_feed(post.sender.profile.score, post.sender.profile.count_of_rates,
-                                  reposter.profile.total_successful_reposts / reposter.profile.total_reposts)
+            value = value_of_feed(post.sender.score, post.sender.count_of_rates,
+                                  reposter.total_successful_reposts / reposter.total_reposts)
 
             Feed.objects.bulk_create(
                 Feed(user=u, post=post, reposter=self.request.user, sort_value=value, buyable=u.pk != post.sender.pk)
@@ -107,8 +106,8 @@ class Repost(generics.UpdateAPIView):
             Feed.objects.create(user=self.request.user, post=post, reposter=self.request.user,
                                 sort_value=value)
             ProfilePost.objects.create(user=self.request.user, post=post, is_repost=True)
-            reposter.profile.total_reposts = F('total_reposts') + 1
-            reposter.profile.save()
+            reposter.total_reposts = F('total_reposts') + 1
+            reposter.save()
         else:
             post.reposters.remove(reposter)
             increment = -1
@@ -117,8 +116,8 @@ class Repost(generics.UpdateAPIView):
             Feed.objects.filter(user=self.request.user
                                 , post=post, reposter=self.request.user).delete()
             ProfilePost.objects.filter(user=self.request.user, post=post).delete()
-            reposter.profile.total_reposts = F('total_reposts') - 1
-            reposter.profile.save()
+            reposter.total_reposts = F('total_reposts') - 1
+            reposter.save()
         serializer.save(user=self.request.user, reposted=reposted, n_reposters=post.n_reposters + increment)
 
 
@@ -132,16 +131,16 @@ class SendPost(generics.CreateAPIView):
         serializer.save(sender=self.request.user)
 
 
-class UserPosts(generics.ListAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostWithoutSenderSerializer
-
-    def list(self, request, *args, **kwargs):
-        serializer = PostWithoutSenderSerializer(self.filter_queryset(self.get_queryset()), many=True)
-        return Response(serializer.data)
-
-    def filter_queryset(self, queryset):
-        return queryset.filter(sender__username=self.kwargs['username'])
+# class UserPosts(generics.ListAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostWithoutSenderSerializer
+#
+#     # def list(self, request, *args, **kwargs):
+#     #     serializer = PostWithoutSenderSerializer(self.filter_queryset(self.get_queryset()), many=True)
+#     #     return Response(serializer.data)
+#
+#     def filter_queryset(self, queryset):
+#         return queryset.filter(sender__username=self.kwargs['username'])
 
 
 class PostDetail(generics.RetrieveAPIView):
@@ -215,6 +214,7 @@ class SuggestPost(generics.ListCreateAPIView):
         return Suggest.objects.filter(suggest_to=self.request.user)
 
 
+#
 class UserPosts(generics.ListAPIView):
     queryset = ProfilePost.objects.all()
     serializer_class = ProfilePostSerializer

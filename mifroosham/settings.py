@@ -81,6 +81,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'mifroosham.wsgi.application'
 
 
+AUTH_USER_MODEL = 'profiles.User'
+
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 

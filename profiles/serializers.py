@@ -1,27 +1,31 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from . import exceptions
-from .models import Profile, PhoneNumber, PhoneNumberConfirmation, Review, Follow
-from django.contrib.auth.models import User
+from .models import User, PhoneNumber, PhoneNumberConfirmation, Review, Follow
+
 from django.utils import timezone
 
+user_fields = ('score', 'avatar_url', 'bio', 'full_name', 'count_of_rates', 'location', 'show_phone_number', 'username')
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    score = serializers.ReadOnlyField()
-    count_of_rates = serializers.ReadOnlyField()
-
-    class Meta:
-        model = Profile
-        fields = ('score', 'avatar_url', 'bio', 'full_name', 'count_of_rates', 'location', 'show_phone_number')
-
+#
+# class ProfileSerializer(serializers.ModelSerializer):
+#     score = serializers.ReadOnlyField()
+#     count_of_rates = serializers.ReadOnlyField()
+#
+#     class Meta:
+#         model = User
+#         fields = ('score', 'avatar_url', 'bio', 'full_name', 'count_of_rates', 'location', 'show_phone_number')
+#
 
 class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(read_only=True)
+    score = serializers.ReadOnlyField()
+    count_of_rates = serializers.ReadOnlyField()
+    username = serializers.ReadOnlyField()
 
     class Meta:
         model = User
-        fields = ('username', 'profile')
+        fields = user_fields
         depth = 1
 
 
@@ -36,59 +40,54 @@ class UserWithFollowCountSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'profile', 'follow')
+        fields = user_fields + ('follow',)
 
 
-class UserWithoutProfileSerializer(serializers.ModelSerializer):
+# class UserWithoutProfileSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('username',)
+
+
+
+class MyProfileSerializer(UserSerializer):
+    money = serializers.ReadOnlyField()
+
     class Meta:
         model = User
-        fields = ('username',)
-
-
-class SignUpSerializer(serializers.Serializer):
-    password = serializers.CharField(write_only=True)
-    phone_number = serializers.CharField(write_only=True)
-    username = serializers.CharField()
-
-    def create(self, validated_data):
-        phone_number = validated_data.get('phone_number')
-        user = User.objects.create_user(username=validated_data.get('username'),
-                                        password=validated_data.get('password'))
-        phone, created = PhoneNumber.objects.get_or_create(user=user, number=phone_number)
-        if not created:
-            raise exceptions.CreateUserException(code=502, detail='this phone number exists')
-        return user
-
-
-class MyProfileSerializer(serializers.ModelSerializer):
-    money = serializers.ReadOnlyField()
-    user = UserWithoutProfileSerializer(read_only=True)
-    score = serializers.ReadOnlyField()
-    count_of_rates = serializers.ReadOnlyField()
-
-    class Meta:
-        model = Profile
-        fields = (
-            'money', 'score', 'count_of_rates', 'avatar_url', 'user', 'full_name', 'show_phone_number', 'location',
-            'bio')
+        fields = user_fields + ('money',)
 
 
 class UpdateProfilePhotoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
+        model = User
         fields = ('avatar_url',)
 
 
 class FollowSerializers(serializers.ModelSerializer):
     following = serializers.BooleanField(read_only=True)
     username = serializers.CharField(read_only=True)
-    profile = ProfileSerializer(read_only=True)
     requester = UserSerializer(read_only=True)
 
     class Meta:
         model = User
-        fields = ('username', 'profile', 'following', 'requester')
+        fields = ('username', 'following', 'requester')
         depth = 1
+
+
+class SignUpSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
+    phone_number = serializers.CharField(write_only=True)
+    username = serializers.CharField()
+
+    def create(self, validated_data):
+        phone_number = validated_data.get('phone_number')
+        user = User.objects.create_user(username=validated_data.get('username'),
+                                        password=validated_data.get('password'), full_name=validated_data.get('username'))
+        phone, created = PhoneNumber.objects.get_or_create(number=phone_number)
+        if not created:
+            raise exceptions.CreateUserException(code=502, detail='this phone number exists')
+        return user
 
 
 class RequestConfirmation(serializers.Serializer):
@@ -158,7 +157,6 @@ class AuthTokenSerializer(serializers.Serializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     reviewer = UserSerializer(read_only=True)
-
 
     class Meta:
         model = Review

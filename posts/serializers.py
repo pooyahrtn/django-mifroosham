@@ -1,17 +1,20 @@
 from rest_framework import serializers, pagination
 from .models import Post, Feed, Auction, Discount, Comment, Suggest, ProfilePost
-from django.contrib.auth.models import User
-from profiles.serializers import UserSerializer, ProfileSerializer
+from profiles.models import User
+from profiles.serializers import UserSerializer
 import time
 from django.utils import timezone
 from .exceptions import *
 
-post_fields = ('sender', 'title', 'price', 'is_charity', 'image_url_0',
-               'image_url_1', 'image_url_2', 'image_url_3',
-               'image_url_4', 'image_url_5', 'description',
-               'discount', 'auction', 'disable_after_buy', 'deliver_time', 'ads_included',
-               'sender_type', 'remaining_qeroons', 'uuid', 'sent_time', 'total_invested_qeroons', 'n_likes',
-               'n_reposters', 'post_type', 'location', 'n_comments')
+post_without_sender_fields = ('title', 'price', 'is_charity', 'image_url_0',
+                              'image_url_1', 'image_url_2', 'image_url_3',
+                              'image_url_4', 'image_url_5', 'description',
+                              'discount', 'auction', 'disable_after_buy', 'deliver_time', 'ads_included',
+                              'remaining_qeroons', 'uuid', 'sent_time', 'total_invested_qeroons',
+                              'n_likes',
+                              'n_reposters', 'post_type', 'location', 'n_comments')
+
+post_fields = ('sender',) + post_without_sender_fields
 
 
 class AuctionSerializer(serializers.ModelSerializer):
@@ -30,14 +33,6 @@ class DiscountSerializer(serializers.ModelSerializer):
         model = Discount
         fields = ('start_price', 'real_price', 'start_time', 'end_time')
 
-        # def create(self, validated_data):
-        #      # validate_dicount_time(validated_data.get('end_time'))
-        #     # super(DiscountSerializer, self).create(validated_data)
-        #
-        # def update(self, instance, validated_data):
-        #     # validate_dicount_time(validated_data.get('end_time'))
-        #     # super(DiscountSerializer, self).update(instance, validated_data)
-
 
 class PostWithoutSenderSerializer(serializers.ModelSerializer):
     discount = DiscountSerializer(allow_null=True, required=False)
@@ -46,17 +41,17 @@ class PostWithoutSenderSerializer(serializers.ModelSerializer):
     # todo: remove allow null
     n_likes = serializers.IntegerField(read_only=True)
     n_reposters = serializers.IntegerField(read_only=True)
-    disabled = serializers.ReadOnlyField()
     remaining_qeroons = serializers.ReadOnlyField()
+
 
     class Meta:
         model = Post
-        exclude = ('sender', 'likes', 'reposters', 'id', 'waiting_to_confirm', 'confirmed_to_show')
+        fields = post_without_sender_fields
         depth = 1
 
 
 class LikePostSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    # user = UserSerializer(read_only=True)
     liked = serializers.BooleanField(read_only=True)
     title = serializers.CharField(read_only=True)
     n_likes = serializers.IntegerField(read_only=True)
@@ -65,11 +60,11 @@ class LikePostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('uuid', 'title', 'user', 'liked', 'n_likes', 'n_reposters')
+        fields = ('uuid', 'title', 'liked', 'n_likes', 'n_reposters')
 
 
 class RepostPostSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    # user = UserSerializer(read_only=True)
     reposted = serializers.BooleanField(read_only=True)
     title = serializers.CharField(read_only=True)
     n_likes = serializers.IntegerField(read_only=True)
@@ -77,13 +72,12 @@ class RepostPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('uuid', 'title', 'user', 'reposted', 'n_likes', 'n_reposters')
+        fields = ('uuid', 'title', 'reposted', 'n_likes', 'n_reposters')
 
 
 class PostSerializer(PostWithoutSenderSerializer):
     sender = UserSerializer(read_only=True)
-    sender_type = serializers.IntegerField(write_only=True)
-    post_type = serializers.IntegerField(source='get_post_type', read_only=True)
+
 
     class Meta:
         model = Post
@@ -99,6 +93,7 @@ class SendPostSerializer(serializers.ModelSerializer):
     sender_type = serializers.IntegerField(write_only=True)
     remaining_qeroons = serializers.ReadOnlyField()
     total_invested_qeroons = serializers.ReadOnlyField()
+    deliver_time = serializers.IntegerField(allow_null=False, required=True)
     image_url_1 = serializers.ImageField(allow_null=True, required=False)
     image_url_2 = serializers.ImageField(allow_null=True, required=False)
     image_url_3 = serializers.ImageField(allow_null=True, required=False)
@@ -142,8 +137,8 @@ class SendPostSerializer(serializers.ModelSerializer):
                 raise SendPostException(detail='auction end time cant be null')
             if ads_included:
                 remaining_qeroons = int(validated_data.get('auction_base_price') * 0.001)
-            if validated_data.get('next_buy_ben') > 0.1 * validated_data.get('auction_base_price'):
-                raise SendPostException(detail='too much ben')
+            # if validated_data.get('next_buy_ben') > 0.1 * validated_data.get('auction_base_price'):
+            #     raise SendPostException(detail='too much ben')
             end_time = timezone.now() + timezone.timedelta(days=validated_data.pop('end_time'))
             auction = Auction.objects.create(base_money=validated_data.pop('auction_base_price'),
                                              end_time=end_time)
@@ -161,8 +156,8 @@ class SendPostSerializer(serializers.ModelSerializer):
                 raise SendPostException(detail='discount end time cant be null')
             if ads_included:
                 remaining_qeroons = int(validated_data.get('discount_start_price') * 0.001)
-            if validated_data.get('next_buy_ben') > validated_data.get('discount_start_price') * 0.1:
-                raise SendPostException('too much ben')
+            # if validated_data.get('next_buy_ben') > validated_data.get('discount_start_price') * 0.1:
+            #     raise SendPostException('too much ben')
             # validate_dicount_time(validated_data.get('end_time'))
             end_time = timezone.now() + timezone.timedelta(days=validated_data.pop('end_time'))
             discount = Discount.objects.create(start_price=validated_data.pop('discount_start_price'),
@@ -176,9 +171,9 @@ class SendPostSerializer(serializers.ModelSerializer):
         else:
             if validated_data.get('price') < 1000:
                 raise SendPostException(detail='low price')
-            if validated_data.get('next_buy_ben') > 0.1:
-                raise SendPostException('too much ben'
-                                        '')
+            # if validated_data.get('next_buy_ben') > 0.1:
+            #     raise SendPostException('too much ben'
+            #                             '')
             if ads_included:
                 remaining_qeroons = int(validated_data.get('price') * 0.001)
         return Post.objects.create(remaining_qeroons=remaining_qeroons, image_count=image_count, **validated_data)
@@ -209,12 +204,12 @@ class FeedsUUIDSerializer(serializers.Serializer):
     visiting_version = serializers.IntegerField()
 
 
-class PostDetailSerializer(PostSerializer):
-    you_liked = serializers.BooleanField(read_only=True)
-
-    class Meta:
-        model = Post
-        fields = post_fields + ('you_liked', )
+# class PostDetailSerializer(PostSerializer):
+#     you_liked = serializers.BooleanField(read_only=True)
+#
+#     class Meta:
+#         model = Post
+#         fields = post_fields + ('you_liked',)
 
 
 class CommentSerializer(serializers.ModelSerializer):

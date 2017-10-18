@@ -48,7 +48,7 @@ class PostAdmin(admin.ModelAdmin):
             for tag in m:
                 Tag.objects.get_or_create(name=tag, post=obj)
             obj.save()
-            value = value_of_feed(obj.sender.profile.score, obj.sender.profile.count_of_rates, 1)
+            value = value_of_feed(obj.sender.score, obj.sender.count_of_rates, 1)
             # todo : bulk create it
             for user in obj.sender.follow.followers.all():
                 Feed.objects.create(user=user, post=obj, sort_value=value)

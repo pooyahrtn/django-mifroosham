@@ -4,7 +4,7 @@ from posts.serializers import PostSerializer
 from .models import Transaction, QeroonTransaction
 from profiles.serializers import UserSerializer, ReviewSerializer
 from posts.models import Feed, Post
-from django.contrib.auth.models import User
+from profiles.models import User
 
 
 class BuyTransactionSerializer(serializers.Serializer):
@@ -14,7 +14,7 @@ class BuyTransactionSerializer(serializers.Serializer):
     def validate(self, attrs):
         post_uuid = attrs.get('post_uuid')
         reposter_username = attrs.get('reposter_username')
-        post = get_object_or_404(Post, uuid=post_uuid)
+        post = get_object_or_404(Post.objects.select_for_update(), uuid=post_uuid)
         reposter = None
         if User.objects.filter(username=reposter_username).exists():
             reposter = User.objects.get(username=reposter_username)

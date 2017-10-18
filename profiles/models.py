@@ -1,6 +1,6 @@
 from __future__ import division
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db.models import F
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -9,8 +9,7 @@ from rest_framework.authtoken.models import Token
 import uuid as uuid_lib
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+class User(AbstractUser):
     money = models.BigIntegerField(default=0)
     qeroon = models.IntegerField(default=100)
     avatar_url = models.ImageField(null=True, blank=True)
@@ -31,7 +30,7 @@ class Profile(models.Model):
     image_tag.short_description = 'avatar'
 
     def __str__(self):
-        return self.user.username
+        return self.username
 
 
 class Follow(models.Model):
@@ -52,20 +51,27 @@ class PhoneNumber(models.Model):
         return self.user.username
 
 
+#
+# class PhoneNumberConfirmationManager(models.Manager):
+#     def create_confirmation(self, phone_number):
+#
+
 class PhoneNumberConfirmation(models.Model):
     user = models.OneToOneField(to=User, related_name='phone_confirmation')
-    confirm_code = models.IntegerField()
+    confirm_code = models.IntegerField(blank=True, null=True)
     last_request_time = models.DateTimeField(null=True, blank=True, auto_now_add=True)
 
     def __str__(self):
         return self.user.username
 
 
+# todo : check this.
 class ReviewManager(models.Manager):
     def write_review(self, **kwargs):
         if kwargs['rate'] > 5 or kwargs['rate'] < 0:
             return
-        Profile.objects.filter(user=kwargs['for_user']) \
+
+        User.objects.filter(pk=kwargs['for_user']) \
             .update(score=(F('score') * F('count_of_rates') + kwargs['rate']) / (F('count_of_rates') + 1),
                     count_of_rates=F('count_of_rates') + 1
                     )
@@ -75,8 +81,9 @@ class ReviewManager(models.Manager):
         if kwargs['rate'] > 5 or kwargs['rate'] < 0:
             return
 
-        Profile.objects.filter(user=kwargs['for_user']) \
-            .update(score=(F('score') * F('count_of_rates') + kwargs['rate'] - last_review.rate) / (F('count_of_rates')))
+        User.objects.filter(pk=kwargs['for_user']) \
+            .update(
+            score=(F('score') * F('count_of_rates') + kwargs['rate'] - last_review.rate) / (F('count_of_rates')))
         self.filter(pk=last_review.pk).update(**kwargs)
 
 
@@ -100,8 +107,6 @@ class Review(models.Model):
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
         # instance.is_active = False
-        Profile.objects.create(user=instance)
         Follow.objects.create(user=instance)
         Token.objects.create(user=instance)
         # instance.save()
-    instance.profile.save()
