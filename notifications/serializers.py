@@ -1,8 +1,10 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import NotificationToken, TransactionNotification
+from .models import NotificationToken, TransactionNotification, PostNotification, FollowNotification
 from profiles.serializers import UserSerializer
 from transactions.serializers import TransactionSerializer
+from posts.serializers import PostSerializer
+
 
 class UserTokenSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -24,3 +26,19 @@ class TransactionNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransactionNotification
         fields = ('status', 'uuid', 'time', 'transaction')
+
+
+class PostNotificationSerializer(serializers.ModelSerializer):
+    post = PostSerializer()
+    who_did = UserSerializer()
+    class Meta:
+        model = PostNotification
+        fields = ('uuid', 'post', 'status', 'who_did')
+
+
+class FollowNotificationSerializer(serializers.ModelSerializer):
+    follower = UserSerializer()
+
+    class Meta:
+        model = FollowNotification
+        fields = ('follower', 'time', )

@@ -61,7 +61,7 @@ class PostNotificationManager(models.Manager):
         user = post.sender
         if requester == user:
             return
-        notification = self.model(post=post, user=user, status=status)
+        notification = self.model(post=post, user=user, status=status, who_did=requester)
         notification.save()
         if NotificationToken.objects.filter(user=user).exists():
             tasks.send_post_push_notification.delay(id=user.notification_token.token, status=status,
@@ -81,12 +81,14 @@ class PostNotification(models.Model):
         db_index=True,
         default=uuid_lib.uuid4,
         editable=False)
-
+    # todo : remove null idiot
+    time = models.DateTimeField(auto_now_add=True, null=True)
     status = models.CharField(choices=NOTIFICATION_TYPES, max_length=2)
     post = models.ForeignKey(Post)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='posts_notifications')
     read = models.BooleanField(default=False)
-
+    # todo: remove null
+    who_did = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_sent_post_notifications', null=True)
     objects = PostNotificationManager()
 
 
@@ -105,4 +107,3 @@ class FollowNotification(models.Model):
     read = models.BooleanField(default=False)
 
     objects = FollowNotificationManger()
-

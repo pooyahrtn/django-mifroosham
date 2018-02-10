@@ -411,7 +411,7 @@ class InvestHelps(APIView):
 
     def get(self, request, *args, **kwargs):
         template = loader.get_template('helps/invest.json')
-        context = {'qeroon_value': qeroon_value, 'your_qeroons': self.request.user.profile.qeroon}
+        context = {'qeroon_value': qeroon_value, 'your_qeroons': self.request.user.qeroon}
         return HttpResponse(template.render(context, request))
 
 

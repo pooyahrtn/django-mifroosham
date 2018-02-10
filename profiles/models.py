@@ -20,7 +20,7 @@ class User(AbstractUser):
     full_name = models.CharField(null=True, max_length=40)
     score = models.FloatField(default=0, blank=True)
     count_of_rates = models.IntegerField(default=0)
-    total_reposts = models.IntegerField(default=0)
+    total_reposts = models.IntegerField(default=1)
     total_successful_reposts = models.IntegerField(default=1)
     count_visiting_app = models.IntegerField(default=1)
 

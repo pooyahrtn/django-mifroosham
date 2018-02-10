@@ -108,6 +108,7 @@ class Repost(generics.UpdateAPIView):
             ProfilePost.objects.create(user=self.request.user, post=post, is_repost=True)
             reposter.total_reposts = F('total_reposts') + 1
             reposter.save()
+            PostNotification.objects.create_notification(post, reposter, PostNotification.SHARE)
         else:
             post.reposters.remove(reposter)
             increment = -1

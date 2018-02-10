@@ -32,10 +32,46 @@ class TransactionNotifications(generics.ListAPIView):
     class Meta:
         ordering = ['-pk']
 
+
+class PostNotifications(generics.ListAPIView):
+    queryset = models.PostNotification
+    serializer_class = serializers.PostNotificationSerializer
+    permission_classes = (permissions.permissions.IsAuthenticated,)
+    pagination_class = None
+
+    #  def get_queryset(self):
+    #     return models.PostNotification.objects.get_unread_notifications(self.request.user).all()
+    def filter_queryset(self, queryset):
+        return queryset.objects.filter(user=self.request.user)
+
+
+class FollowNotifications(generics.ListAPIView):
+    queryset = models.FollowNotification
+    serializer_class = serializers.FollowNotificationSerializer
+    permission_classes = (permissions.permissions.IsAuthenticated,)
+    pagination_class = None
+
+    def filter_queryset(self, queryset):
+        return queryset.objects.filter(user=self.request.user)
+
+
+class ReadPostNotifications(APIView):
+
+    def post(self, request, *args, **kwargs):
+        models.PostNotification.objects.filter(user=self.request.user).delete()
+        return Response('ok', status=status.HTTP_200_OK)
+
+
+class ReadFollowNotifications(APIView):
+
+    def post(self, request, *args, **kwargs):
+        models.FollowNotification.objects.filter(user=self.request.user).delete()
+        return Response('ok', status=status.HTTP_200_OK)
+
+
 class ReadTransactionNotifications(generics.DestroyAPIView):
     permissions = (permissions.permissions.IsAuthenticated,)
 
-    @transaction.atomic
     def post(self, request, *args, **kwargs):
         models.TransactionNotification.objects.filter(user=self.request.user).delete()
         return Response(data='deleted', status=status.HTTP_200_OK)
